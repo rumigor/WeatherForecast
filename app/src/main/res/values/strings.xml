@@ -8,4 +8,7 @@
     <string name="settings">Settings</string>
     <string name="cityName">Saint Petersburg</string>
     <string name="todayTemp">+15°C</string>
+    <string name="spb">Saint Petersburg</string>
+    <string name="vln">Vilnius</string>
+    <string name="bcn">Barcelona</string>
 </resources>

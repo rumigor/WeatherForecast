@@ -2,46 +2,31 @@ package com.example.weatherforecast;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CurrentWeatherFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class CurrentWeatherFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String WEATHER = "Weather_Parameters";
+    TextView cityName;
+    TextView temperature;
+    ImageView weatherCondition;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
-    public CurrentWeatherFragment() {
-        // Required empty public constructor
-    }
+    private Weather weather;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CurrentWeatherFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CurrentWeatherFragment newInstance(String param1, String param2) {
-        CurrentWeatherFragment fragment = new CurrentWeatherFragment();
+    public static ForecastFragment create(Weather weather) {
+        ForecastFragment fragment = new ForecastFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putSerializable(WEATHER, weather);
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,8 +35,7 @@ public class CurrentWeatherFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            weather = (Weather) getArguments().getSerializable(WEATHER);
         }
     }
 
@@ -60,5 +44,75 @@ public class CurrentWeatherFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_current_weather, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        cityName = view.findViewById(R.id.cityName2);
+        temperature = view.findViewById(R.id.currentTemp2);
+        weatherCondition = view.findViewById(R.id.imageView2);
+        if (weather != null) {
+            cityName.setText(weather.getCityName());
+            temperature.setText(weather.getTemperature());
+            setPic(weather.getwCond());
+        }
+        if (savedInstanceState != null){
+            weather = (Weather) savedInstanceState.getSerializable(WEATHER);
+            cityName.setText(weather.getCityName());
+            temperature.setText(weather.getTemperature());
+            setPic(weather.getwCond());
+        }
+    }
+
+    private void setPic(int wCond) {
+        switch (wCond){
+            case 1:
+                weatherCondition.setImageResource(R.drawable.sun2);
+                break;
+            case 2:
+                weatherCondition.setImageResource(R.drawable.party_cloudy);
+                break;
+            case 3:
+                weatherCondition.setImageResource(R.drawable.cloudy);
+                break;
+            case 4:
+                weatherCondition.setImageResource(R.drawable.rainy);
+                break;
+            case 5:
+                weatherCondition.setImageResource(R.drawable.thunderstorm);
+                break;
+        }
+    }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        int wCond = picEquals(weatherCondition);
+        weather = new Weather(cityName.getText().toString(), temperature.getText().toString(), wCond);
+        outState.putSerializable(WEATHER, weather);
+    }
+
+    private int picEquals(ImageView mainImage) {
+        if (mainImage.getDrawable().getConstantState() == getActivity()
+                .getResources().getDrawable(R.drawable.sun2)
+                .getConstantState()) {
+            return 1;
+        } else if (mainImage.getDrawable().getConstantState() == getActivity()
+                .getResources().getDrawable(R.drawable.party_cloudy)
+                .getConstantState()) {
+            return 2;
+        } else if ((mainImage.getDrawable().getConstantState() == getActivity()
+                .getResources().getDrawable(R.drawable.cloudy)
+                .getConstantState())) {
+            return 3;
+        } else if (mainImage.getDrawable().getConstantState() == getActivity()
+                .getResources().getDrawable(R.drawable.rainy)
+                .getConstantState()) {
+            return 4;
+        } else if (mainImage.getDrawable().getConstantState() == getActivity()
+                .getResources().getDrawable(R.drawable.thunderstorm)
+                .getConstantState()) {
+            return 5;
+        } else return 0;
     }
 }
