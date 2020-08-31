@@ -23,8 +23,8 @@ public class CurrentWeatherFragment extends Fragment {
 
     private Weather weather;
 
-    public static ForecastFragment create(Weather weather) {
-        ForecastFragment fragment = new ForecastFragment();
+    public static CurrentWeatherFragment create(Weather weather) {
+        CurrentWeatherFragment fragment = new CurrentWeatherFragment();
         Bundle args = new Bundle();
         args.putSerializable(WEATHER, weather);
         fragment.setArguments(args);

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WeatherForecast</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="forecast">Прогноз погоды</string>
+    <string name="choose_city">Выбрать город</string>
+    <string name="more_on_gismeteo">Перейти на GISMETEO</string>
+    <string name="settings">Настройки</string>
+    <string name="cityName">Санкт-Петербург</string>
+    <string name="todayTemp">+15°C</string>
+    <string name="spb">Санкт-Петербург</string>
+    <string name="vln">Вильнюс</string>
+    <string name="bcn">Барселона</string>
+    <string name="msc">Москва</string>
+    <string name="bru">Брюссель</string>
+    <string name="today">Сегодня</string>
+    <string name="settingsTitle">Настройки</string>
+    <string name="save_settings">Сохранить настройки</string>
+    <string name="dark_theme">Ночной режим</string>
+    <string name="celcius">Цельсий</string>
+    <string name="fahrenheit">Фаренгейт</string>
+    <string name="degree">Градусы</string>
+    <string name="reset_search">Очистить список</string>
+</resources>

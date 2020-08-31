@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,8 +44,16 @@ public class ForecastFragment extends Fragment {
             new Forecast("Wednesday", "+26°", 3), new Forecast("Thursday", "+27°C", 2), new Forecast("Friday", "+28°C", 1), new Forecast("Saturday", "+23°C", 4),
             new Forecast("Sunday", "+22°C", 3)};
 
+    private final Forecast[] mscDays = {new Forecast("Monday", "+28°C", 2), new Forecast("Tuesday", "+22°C", 5),
+            new Forecast("Wednesday", "+20°", 1), new Forecast("Thursday", "+21°C", 1), new Forecast("Friday", "+22°C", 2), new Forecast("Saturday", "+17°C", 4),
+            new Forecast("Sunday", "+22°C", 2)};
 
-
+    private final Forecast[] bruDays = {new Forecast("Monday", "+24°C", 4), new Forecast("Tuesday", "+18°C", 4),
+            new Forecast("Wednesday", "+19°", 2), new Forecast("Thursday", "+20°C", 3), new Forecast("Friday", "+24°C", 3), new Forecast("Saturday", "+18°C", 4),
+            new Forecast("Sunday", "+19°C", 2)};
+    private final Forecast[] noData = {new Forecast("Monday", "-°C", 1), new Forecast("Tuesday", "-°C", 1),
+            new Forecast("Wednesday", "-°C", 1), new Forecast("Thursday", "-°C", 1), new Forecast("Friday", "-°C", 1), new Forecast("Saturday", "-°C", 1),
+            new Forecast("Sunday", "-°C", 1)};
 
     public ForecastFragment() {
         // Required empty public constructor
@@ -79,11 +88,19 @@ public class ForecastFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         final RecyclerView recyclerView = view.findViewById(R.id.weatherRecyclerView);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
+            DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity(),  LinearLayoutManager.HORIZONTAL);
+            itemDecoration.setDrawable(requireActivity().getDrawable(R.drawable.separator));
+            recyclerView.addItemDecoration(itemDecoration);
         } else {
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+            DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity(),  LinearLayoutManager.VERTICAL);
+            itemDecoration.setDrawable(requireActivity().getDrawable(R.drawable.separator));
+            recyclerView.addItemDecoration(itemDecoration);
         }
         recyclerView.setAdapter(weatherAdapter);
+
+
         if (savedInstanceState != null){
             cityName = savedInstanceState.getString(CITY_NAME);
         }
@@ -99,6 +116,18 @@ public class ForecastFragment extends Fragment {
         else if (cityName.equals(getString(R.string.bcn))){
             weatherAdapter.setDays(Arrays.asList(bcnDays));
         }
+        else if (cityName.equals(getString(R.string.msc))){
+            weatherAdapter.setDays(Arrays.asList(mscDays));
+        }
+        else if (cityName.equals(getString(R.string.bru))){
+            weatherAdapter.setDays(Arrays.asList(bruDays));
+        }
+        else weatherAdapter.setDays(Arrays.asList(noData));
+    }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(CITY_NAME, cityName);
     }
 
 
