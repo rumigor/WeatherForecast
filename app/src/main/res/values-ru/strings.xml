@@ -21,4 +21,8 @@
     <string name="fahrenheit">Фаренгейт</string>
     <string name="degree">Градусы</string>
     <string name="reset_search">Очистить список</string>
+    <string name="about_wf">О программе</string>
+    <string name="title_home">Главная</string>
+    <string name="title_dashboard">Настройки</string>
+    <string name="title_notifications">О программе</string>
 </resources>

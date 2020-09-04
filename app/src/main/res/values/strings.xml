@@ -20,4 +20,8 @@
     <string name="fahrenheit">Farenheit</string>
     <string name="degree">Degree</string>
     <string name="reset_search">Reset search</string>
+    <string name="about_wf">About WF</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Settings</string>
+    <string name="title_notifications">About</string>
 </resources>

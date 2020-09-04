@@ -4,14 +4,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
     private static final String WEATHER = "Weather_Parameters";
@@ -22,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
     ForecastFragment forecastFragment;
     Weather weather;
     Button chgCity;
-    Button settings;
     private boolean nightTheme;
+
 
 
 
@@ -58,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, CityChangerActivity.class);
-                intent.putExtra(NIGHT_THEME, nightTheme);
                 startActivityForResult(intent, REQUEST_CODE);
             }
         });
@@ -89,15 +98,49 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        settings = findViewById(R.id.settings);
-        settings.setOnClickListener(new View.OnClickListener() {
+
+
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navView, navController);
+
+        navView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View view) {
-                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
-                settingsIntent.putExtra(NIGHT_THEME, nightTheme);
-                startActivityForResult(settingsIntent, REQUEST_CODE_SET);
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.navigation_home:
+                        return true;
+                    case R.id.navigation_dashboard:
+                        Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                        startActivityForResult(settingsIntent, REQUEST_CODE_SET);
+                        return true;
+                    case R.id.navigation_notifications:
+                        startActivity(new Intent(getApplicationContext(), AboutActivity.class));
+                        return true;
+                }
+                return false;
             }
         });
+    }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        startActivity(new Intent(getApplicationContext(), AboutActivity.class));
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -119,33 +162,16 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
         if (resultCode == 100){
-            nightTheme = data.getExtras().getBoolean(NIGHT_THEME);
-            ConstraintLayout layout = findViewById(R.id.mainLayout);
-            if (nightTheme){
-                layout.setBackgroundColor(Color.rgb(0, 85, 124));
-            }
-            else {
-                layout.setBackgroundColor(Color.rgb(0, 188, 212));
-            }
+            recreate();
+//            nightTheme = data.getExtras().getBoolean(NIGHT_THEME);
+//            ConstraintLayout layout = findViewById(R.id.mainLayout);
+//            if (nightTheme){
+//                setTheme(R.style.AppDarkTheme);;
+//            }
+//            else {
+//                setTheme(R.style.AppTheme);;
+//            }
         }
     }
 
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(NIGHT_THEME, nightTheme);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        nightTheme = savedInstanceState.getBoolean(NIGHT_THEME);
-        ConstraintLayout layout = findViewById(R.id.mainLayout);
-        if (nightTheme){
-            layout.setBackgroundColor(Color.rgb(0, 85, 124));
-        }
-        else {
-            layout.setBackgroundColor(Color.rgb(0, 188, 212));
-        }
-    }
 }

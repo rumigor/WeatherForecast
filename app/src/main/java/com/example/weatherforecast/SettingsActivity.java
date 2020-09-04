@@ -4,18 +4,26 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
-public class SettingsActivity extends AppCompatActivity {
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+public class SettingsActivity extends BaseActivity {
     private static final String NIGHT_THEME = "darkTheme";
     private static final String CELSIUS = "celsiusDegree";
     private SwitchCompat theme;
@@ -33,11 +41,11 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         theme = findViewById(R.id.nightTheme);
         layout = findViewById(R.id.backgroundLayout);
-        nightMode = getIntent().getExtras().getBoolean(NIGHT_THEME);
-        if (nightMode){
-            theme.setChecked(true);
-            layout.setBackgroundColor(Color.rgb(0, 85, 124));
-        }
+//        nightMode = getIntent().getExtras().getBoolean(NIGHT_THEME);
+//        if (nightMode){
+//            theme.setChecked(true);
+//            setTheme(R.style.AppDarkTheme);
+//        }
         Button cancel = findViewById(R.id.resetButton);
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,22 +57,49 @@ public class SettingsActivity extends AppCompatActivity {
         saveSet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                nightMode = theme.isChecked();
-                intent.putExtra(NIGHT_THEME, nightMode);
-                setResult(100, intent);
+//                Intent intent = new Intent();
+//                nightMode = theme.isChecked();
+//                intent.putExtra(NIGHT_THEME, nightMode);
+//                setResult(100, intent);
                 finish();
             }
         });
-        theme.setOnClickListener(new View.OnClickListener() {
+        theme.setChecked(isDarkTheme());
+
+        theme.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+
             @Override
-            public void onClick(View view) {
-                if (theme.isChecked()) {
-                    layout.setBackgroundColor(Color.rgb(0, 85, 124));
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setDarkTheme(isChecked);
+                recreate();
+            }
+        });
+
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navView, navController);
+
+        navView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.navigation_home:
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        return true;
+                    case R.id.navigation_dashboard:
+                        startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                        return true;
+                    case R.id.navigation_notifications:
+                        startActivity(new Intent(getApplicationContext(), AboutActivity.class));
+                        return true;
                 }
-                else {
-                    layout.setBackgroundColor(Color.rgb(0, 188, 212));
-                }
+                return false;
             }
         });
     }
@@ -109,17 +144,15 @@ public class SettingsActivity extends AppCompatActivity {
         outState.putBoolean(NIGHT_MODE, theme.isChecked());
     }
 
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        boolean status = savedInstanceState.getBoolean(NIGHT_MODE);
-        if (status) {
-            theme.setChecked(true);
-            layout.setBackgroundColor(Color.BLUE);
-        }
-        else {
-            theme.setChecked(false);
-            layout.setBackgroundColor(Color.argb(100, 164, 221, 248));
-        }
-    }
+//    @Override
+//    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        boolean status = savedInstanceState.getBoolean(NIGHT_MODE);
+//        if (theme.isChecked()) {
+//            setTheme(R.style.AppDarkTheme);
+//        }
+//        else {
+//            setTheme(R.style.AppTheme);
+//        }
+//    }
 }
