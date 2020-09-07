@@ -20,18 +20,26 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.weatherforecast.model.CityList;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.gson.Gson;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class CityChangerActivity extends AppCompatActivity {
-    private final String WEATHER = "Weather_Parameters";
-    Weather weather;
+    private final String CITY_NAME ="CityName";
+    private String cityName;
     Forecast forecast;
     final CityAdapter cityAdapter = new CityAdapter();
     TextInputEditText search;
@@ -68,24 +76,43 @@ public class CityChangerActivity extends AppCompatActivity {
             public void onClicked(String city) {
                 Intent intent = new Intent(CityChangerActivity.this, MainActivity.class);
                 if (city.equals(cities.get(0))) {
-                    weather = new Weather(city, "+15°C", 4);
+                    cityName = "Saint Petersburg,RU";
                 }
                 else if (city.equals(cities.get(1))){
-                    weather = new Weather(city, "+18°C", 3);
+                    cityName = "Vilnius,LT";
                 }
                 else if (city.equals(cities.get(2))){
-                    weather = new Weather(city, "+29°C", 1);
+                    cityName = "Barcelona,ES";
                 }
                 else if (city.equals(cities.get(3))){
-                    weather = new Weather(city, "+22°C", 2);
+                    cityName = "Moscow,RU";
                 }
                 else if (city.equals(cities.get(4))){
-                    weather = new Weather(city, "+16°C", 3);
+                    cityName = "Brussels,BE";
                 }
                 else {
-                    weather = new Weather(city, "no data", 1);
+                    try (BufferedReader in = new BufferedReader(new FileReader("C:\\Users\\rumig\\AndroidStudioProjects\\WeatherForecast\\app\\src\\main\\java\\com\\example\\weatherforecast\\city.list.json"))) {
+                        String result = getLines(in);
+                        Gson gson = new Gson();
+                        final CityList cityList = gson.fromJson(result, CityList.class);
+                        boolean cityIsFound = false;
+                        for (int i = 0; i < cityList.getCities().length; i++) {
+                            if (cityList.getCities()[i].getName().equals(search.getText().toString())) {
+                                cityName = cityList.getCities()[i].getName() + "," + cityList.getCities()[i].getCountry();
+                                cityIsFound = true;
+                                break;
+                            }
+                        }
+                        if (!cityIsFound) {
+                            Toast.makeText(getApplicationContext(), R.string.cityNotFound, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
-                intent.putExtra(WEATHER, weather);
+                intent.putExtra(CITY_NAME, cityName);
                 setResult(RESULT_OK, intent);
                 finish();
             }
@@ -212,5 +239,9 @@ public class CityChangerActivity extends AppCompatActivity {
         else {
             setTheme(R.style.AppTheme);;
         }
+    }
+
+    private String getLines(BufferedReader in) {
+        return in.lines().collect(Collectors.joining("\n"));
     }
 }

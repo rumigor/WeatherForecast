@@ -24,13 +24,13 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String WEATHER = "Weather_Parameters";
     private final static int REQUEST_CODE = 0x1FAB;
     private final static int REQUEST_CODE_SET = 0x2FAB;
+    private final static String CITY_NAME = "CityName";
+    private String cityName;
     private static final String NIGHT_THEME = "darkTheme";
     CurrentWeatherFragment currentWeatherFragment;
     ForecastFragment forecastFragment;
-    Weather weather;
     Button chgCity;
     private boolean nightTheme;
 
@@ -73,10 +73,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final String city;
-        if (weather == null){
-            city = getString(R.string.spb);
+        if (cityName == null){
+            city = "Saint Petersburg,RU";
         }
-        else city = weather.getCityName();
+        else city = cityName;
         Button goToWeb = findViewById(R.id.openInternet);
         goToWeb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,15 +147,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK){
-            weather = (Weather) data.getExtras().getSerializable(WEATHER);
+            cityName = data.getExtras().getString(CITY_NAME);
             currentWeatherFragment = (CurrentWeatherFragment)getSupportFragmentManager().findFragmentById(R.id.currentWeather);
-            currentWeatherFragment = CurrentWeatherFragment.create(weather);
+            currentWeatherFragment = CurrentWeatherFragment.create(cityName);
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.currentWeather, currentWeatherFragment)
                     .commit();
             forecastFragment = (ForecastFragment)getSupportFragmentManager().findFragmentById(R.id.container);
-            forecastFragment = ForecastFragment.create(weather.getCityName());
+            forecastFragment = ForecastFragment.create(cityName);
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container, forecastFragment)

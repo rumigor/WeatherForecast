@@ -6,7 +6,7 @@
     <string name="choose_city">Выбрать город</string>
     <string name="more_on_gismeteo">Перейти на GISMETEO</string>
     <string name="settings">Настройки</string>
-    <string name="cityName">Санкт-Петербург</string>
+    <string name="cityName">Местоположение</string>
     <string name="todayTemp">+15°C</string>
     <string name="spb">Санкт-Петербург</string>
     <string name="vln">Вильнюс</string>
@@ -25,4 +25,10 @@
     <string name="title_home">Главная</string>
     <string name="title_dashboard">Настройки</string>
     <string name="title_notifications">О программе</string>
+    <string name="wind_speed">Скорость ветра</string>
+    <string name="humidity">Влажность</string>
+    <string name="pressure">Давление</string>
+    <string name="temperature">Температура</string>
+    <string name="refresh">Обновить</string>
+    <string name="cityNotFound">Город не найден!</string>
 </resources>
