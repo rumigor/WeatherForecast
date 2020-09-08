@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.weatherforecast.model.CityList;
+import com.example.weatherforecast.model.Data;
+import com.example.weatherforecast.model.WeatherRequest;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -91,26 +94,7 @@ public class CityChangerActivity extends AppCompatActivity {
                     cityName = "Brussels,BE";
                 }
                 else {
-                    try (BufferedReader in = new BufferedReader(new FileReader("C:\\Users\\rumig\\AndroidStudioProjects\\WeatherForecast\\app\\src\\main\\java\\com\\example\\weatherforecast\\city.list.json"))) {
-                        String result = getLines(in);
-                        Gson gson = new Gson();
-                        final CityList cityList = gson.fromJson(result, CityList.class);
-                        boolean cityIsFound = false;
-                        for (int i = 0; i < cityList.getCities().length; i++) {
-                            if (cityList.getCities()[i].getName().equals(search.getText().toString())) {
-                                cityName = cityList.getCities()[i].getName() + "," + cityList.getCities()[i].getCountry();
-                                cityIsFound = true;
-                                break;
-                            }
-                        }
-                        if (!cityIsFound) {
-                            Toast.makeText(getApplicationContext(), R.string.cityNotFound, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
+                    cityName = city;
                 }
                 intent.putExtra(CITY_NAME, cityName);
                 setResult(RESULT_OK, intent);
@@ -138,14 +122,23 @@ public class CityChangerActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (search.getText() != null) {
-                    Snackbar.make(view, "Click", Snackbar.LENGTH_INDEFINITE).setAction("ADD_CITY", new View.OnClickListener() {
+                    cityName = search.getText().toString();
+                    final Handler handler = new Handler();
+                    final Data data = new Data(cityName);
+                    final WeatherRequest[] weatherRequest = new WeatherRequest[1];
+                    new Thread(new Runnable() {
                         @Override
-                        public void onClick(View view) {
-                            citiesNew.add(search.getText().toString());
-                            cityAdapter.setCities(citiesNew);
-                            search.setText("");
+                        public void run() {
+                            weatherRequest[0] = data.getData();
                         }
-                    }).show();
+                    }).start();
+                    if (weatherRequest[0] == null) {
+                        Toast.makeText(getApplicationContext(), R.string.cityNotFound, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    citiesNew.add(search.getText().toString());
+                    cityAdapter.setCities(citiesNew);
+                    search.setText("");
                 }
             }
         });
