@@ -31,4 +31,6 @@
     <string name="temperature">Температура</string>
     <string name="refresh">Обновить</string>
     <string name="cityNotFound">Город не найден!</string>
+    <string name="pressureValue">мм рт. ст.</string>
+    <string name="windSpeedValue">м/с</string>
 </resources>

@@ -30,4 +30,6 @@
     <string name="temperature">Temperature</string>
     <string name="refresh">Refresh</string>
     <string name="cityNotFound">City not found!</string>
+    <string name="pressureValue">mmHg</string>
+    <string name="windSpeedValue">m/s</string>
 </resources>

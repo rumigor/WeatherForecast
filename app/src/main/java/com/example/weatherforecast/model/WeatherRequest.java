@@ -8,6 +8,7 @@ public class WeatherRequest {
     private Clouds clouds;
     private String name;
 
+
     public Coord getCoord() {
         return coord;
     }

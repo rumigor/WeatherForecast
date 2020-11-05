@@ -1,5 +1,7 @@
 package com.example.weatherforecast;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,12 +17,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.weatherforecast.model.Data;
 import com.example.weatherforecast.model.WeatherRequest;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -42,6 +47,7 @@ public class CurrentWeatherFragment extends Fragment {
     private EditText pressure;
     private EditText humidity;
     private EditText windSpeed;
+    private ImageView currentWeather;
 
 
 
@@ -80,6 +86,24 @@ public class CurrentWeatherFragment extends Fragment {
         pressure = view.findViewById(R.id.textPressure);
         humidity =view.findViewById(R.id.textHumidity);
         windSpeed = view.findViewById(R.id.textWindspeed);
+        currentWeather = view.findViewById(R.id.currentWeather);
+        dataLoading(cityName);
+        Button refresh = view.findViewById(R.id.refresh);
+        refresh.setOnClickListener(clickListener);
+    }
+
+    View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+           dataLoading(cityName);
+        }
+
+        private String getLines(BufferedReader in) {
+            return in.lines().collect(Collectors.joining("\n"));
+        }
+    };
+
+    private void dataLoading(String cityName){
         if (cityName == null){
             cityName = "Saint Petersburg,RU";
         }
@@ -92,62 +116,23 @@ public class CurrentWeatherFragment extends Fragment {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        displayWeather(weatherRequest);
+                        try {
+                            displayWeather(weatherRequest);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    private void displayWeather(WeatherRequest weatherRequest){
+                    private void displayWeather(WeatherRequest weatherRequest) throws IOException {
                         city.setText(weatherRequest.getName());
-                        temperature.setText(String.format("%f2", weatherRequest.getMain().getTemp()-273));
-                        pressure.setText(String.format("%d", weatherRequest.getMain().getPressure()));
-                        humidity.setText(String.format("%d", weatherRequest.getMain().getHumidity()));
-                        windSpeed.setText(String.format("%f2", weatherRequest.getWind().getSpeed()));
+                        temperature.setText(String.format("%d%s", (int) weatherRequest.getMain().getTemp()-273, "°C"));
+                        pressure.setText(String.format("%d %s", (int) (weatherRequest.getMain().getPressure()/1.33), getString(R.string.pressureValue)));
+                        humidity.setText(String.format("%d%s", weatherRequest.getMain().getHumidity(), "%"));
+                        windSpeed.setText(String.format("%d %s", (int) weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue)));
+                        Picasso.with(getContext()).load(String.format("http://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon())).into(currentWeather);
                     }
                 });
             }
         }).start();
-
-        Button refresh = view.findViewById(R.id.refresh);
-        refresh.setOnClickListener(clickListener);
     }
-
-    View.OnClickListener clickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            try {
-                if (cityName == null){
-                    cityName = "Saint Petersburg,RU";
-                }
-                final String url = String.format("https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", cityName, BuildConfig.WEATHER_API_KEY);
-                final URL uri = new URL(url);
-                final Handler handler = new Handler(); // Запоминаем основной поток
-                final Data data = new Data(cityName);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final WeatherRequest weatherRequest = data.getData();
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                displayWeather(weatherRequest);
-                            }
-                            private void displayWeather(WeatherRequest weatherRequest){
-                                city.setText(weatherRequest.getName());
-                                temperature.setText(String.format("%f2", weatherRequest.getMain().getTemp()-273));
-                                pressure.setText(String.format("%d", weatherRequest.getMain().getPressure()));
-                                humidity.setText(String.format("%d", weatherRequest.getMain().getHumidity()));
-                                windSpeed.setText(String.format("%f2", weatherRequest.getWind().getSpeed()));
-                            }
-                        });
-                    }
-                }).start();
-            } catch (MalformedURLException e) {
-                Log.e(TAG, "Fail URI", e);
-                e.printStackTrace();
-            }
-        }
-
-        private String getLines(BufferedReader in) {
-            return in.lines().collect(Collectors.joining("\n"));
-        }
-    };
 
 }
