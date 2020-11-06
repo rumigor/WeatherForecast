@@ -32,4 +32,6 @@
     <string name="cityNotFound">City not found!</string>
     <string name="pressureValue">mmHg</string>
     <string name="windSpeedValue">m/s</string>
+    <string name="day_t">Day T:</string>
+    <string name="night_t">Night T:</string>
 </resources>

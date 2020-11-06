@@ -4,12 +4,14 @@ import java.util.ArrayList;
 
 public class Forecast {
     private String day;
-    private String temp;
-    private int wCond;
+    private String dTemp;
+    private String nTemp;
+    private String wCond;
 
-    public Forecast(String day, String temp, int wCond) {
+    public Forecast(String day, String dTemp, String nTemp, String wCond) {
         this.day = day;
-        this.temp = temp;
+        this.dTemp = dTemp;
+        this.nTemp = nTemp;
         this.wCond = wCond;
     }
 
@@ -17,11 +19,15 @@ public class Forecast {
         return day;
     }
 
-    public String getTemp() {
-        return temp;
+    public String getdTemp() {
+        return dTemp;
     }
 
-    public int getwCond() {
+    public String getnTemp() {
+        return nTemp;
+    }
+
+    public String getwCond() {
         return wCond;
     }
 }

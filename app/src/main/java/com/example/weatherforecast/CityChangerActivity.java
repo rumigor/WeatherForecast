@@ -88,7 +88,7 @@ public class CityChangerActivity extends AppCompatActivity {
                     cityName = "Barcelona,ES";
                 }
                 else if (city.equals(cities.get(3))){
-                    cityName = "Moscow,RU";
+                    cityName = "Moscow";
                 }
                 else if (city.equals(cities.get(4))){
                     cityName = "Brussels,BE";

@@ -33,4 +33,6 @@
     <string name="cityNotFound">Город не найден!</string>
     <string name="pressureValue">мм рт. ст.</string>
     <string name="windSpeedValue">м/с</string>
+    <string name="day_t">Т днем: </string>
+    <string name="night_t">Т ночью: </string>
 </resources>

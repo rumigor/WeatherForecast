@@ -7,16 +7,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
+
 public class ForecastHolder extends RecyclerView.ViewHolder{
     private final TextView day;
-    private final TextView temperature;
+    private final TextView dayT;
+    private final TextView nightT;
     private final ImageView weatherCondition;
 
+    public TextView getNightT() {
+        return nightT;
+    }
 
     public ForecastHolder(@NonNull View itemView) {
         super(itemView);
         day = itemView.findViewById(R.id.day);
-        temperature = itemView.findViewById(R.id.temp);
+        dayT = itemView.findViewById(R.id.dayT);
+        nightT = itemView.findViewById(R.id.nightT);
         weatherCondition = itemView.findViewById(R.id.imageView);
     }
 
@@ -24,38 +31,23 @@ public class ForecastHolder extends RecyclerView.ViewHolder{
         return day;
     }
 
-    public TextView getTemperature() {
-        return temperature;
+    public TextView getDayT() {
+        return dayT;
     }
 
     public ImageView getWeatherCondition() {
         return weatherCondition;
     }
 
-    public void bind (final String dayW, final String temperatureW, final int weatherConditionW){
+    public void bind (final String dayW, final String temperatureW, final String temperatureN,final String weatherConditionW){
         day.setText(dayW);
-        temperature.setText(temperatureW);
+        dayT.setText(temperatureW);
+        nightT.setText(temperatureN);
         setPic(weatherConditionW);
 
     }
 
-    private void setPic(int wCond) {
-        switch (wCond){
-            case 1:
-                weatherCondition.setImageResource(R.drawable.sun2);
-                break;
-            case 2:
-                weatherCondition.setImageResource(R.drawable.party_cloudy);
-                break;
-            case 3:
-                weatherCondition.setImageResource(R.drawable.cloudy);
-                break;
-            case 4:
-                weatherCondition.setImageResource(R.drawable.rainy);
-                break;
-            case 5:
-                weatherCondition.setImageResource(R.drawable.thunderstorm);
-                break;
-        }
+    private void setPic(String wCond) {
+        Picasso.with(itemView.getContext()).load(String.format("http://openweathermap.org/img/wn/%s@4x.png", wCond)).into(weatherCondition);
     }
 }

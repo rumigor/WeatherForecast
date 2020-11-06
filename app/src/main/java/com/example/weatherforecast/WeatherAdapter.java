@@ -27,7 +27,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<ForecastHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ForecastHolder holder, int position) {
-        holder.bind(days.get(position).getDay(), days.get(position).getTemp(), days.get(position).getwCond());
+        holder.bind(days.get(position).getDay(), days.get(position).getdTemp(), days.get(position).getnTemp(),days.get(position).getwCond());
     }
 
     @Override
