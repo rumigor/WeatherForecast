@@ -3,7 +3,6 @@ package com.example.weatherforecast.forecast;
 import android.util.Log;
 
 import com.example.weatherforecast.BuildConfig;
-import com.example.weatherforecast.model.WeatherRequest;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;

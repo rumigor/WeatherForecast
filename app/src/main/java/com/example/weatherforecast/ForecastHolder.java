@@ -39,7 +39,7 @@ public class ForecastHolder extends RecyclerView.ViewHolder{
         return weatherCondition;
     }
 
-    public void bind (final String dayW, final String temperatureW, final String temperatureN,final String weatherConditionW){
+    public void bind (final String dayW, final String temperatureW, final String temperatureN, final String weatherConditionW){
         day.setText(dayW);
         dayT.setText(temperatureW);
         nightT.setText(temperatureN);

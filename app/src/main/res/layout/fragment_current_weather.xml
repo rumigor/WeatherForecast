@@ -8,32 +8,44 @@
     android:background="#00FFFFFF"
     tools:context=".CurrentWeatherFragment">
 
-    <Button
-        android:id="@+id/refresh"
+    <TextView
+        android:id="@+id/forecastTitle2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/refresh"
+        android:layout_marginTop="24dp"
+        android:text="@string/forecast"
+        android:textColor="#FFEBEE"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/weatherRecyclerView"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/forecastTitle2" />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/refresh">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
         <ImageView
             android:id="@+id/currentWeather"
             android:layout_width="120dp"
             android:layout_height="209dp"
             android:layout_marginTop="16dp"
-            android:src="@drawable/rainy"
             tools:srcCompat="@tools:sample/avatars" />
 
         <TableLayout
@@ -59,7 +71,7 @@
                     android:enabled="false"
                     android:inputType="textPersonName"
                     android:text=""
-                    android:textColor="@color/colorPrimaryDark" />
+                    android:textColor="@android:color/holo_orange_light" />
 
             </TableRow>
 
@@ -81,7 +93,7 @@
                     android:enabled="false"
                     android:inputType="textPersonName"
                     android:text=""
-                    android:textColor="@color/colorPrimaryDark" />
+                    android:textColor="@android:color/holo_orange_light" />
             </TableRow>
 
             <TableRow
@@ -102,7 +114,7 @@
                     android:enabled="false"
                     android:inputType="textPersonName"
                     android:text=""
-                    android:textColor="@color/colorPrimaryDark" />
+                    android:textColor="@android:color/holo_orange_light" />
             </TableRow>
 
             <TableRow
@@ -123,7 +135,7 @@
                     android:enabled="false"
                     android:inputType="textPersonName"
                     android:text=""
-                    android:textColor="@color/colorPrimaryDark" />
+                    android:textColor="@android:color/holo_orange_light" />
             </TableRow>
 
             <TableRow
@@ -144,7 +156,7 @@
                     android:enabled="false"
                     android:inputType="textPersonName"
                     android:text=""
-                    android:textColor="@color/colorPrimaryDark" />
+                    android:textColor="@android:color/holo_orange_light" />
             </TableRow>
 
 

@@ -1,68 +1,82 @@
 package com.example.weatherforecast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
-import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
-import java.util.zip.Inflater;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
+
     private final static int REQUEST_CODE = 0x1FAB;
     private final static int REQUEST_CODE_SET = 0x2FAB;
     private final static String CITY_NAME = "CityName";
     private String cityName;
     private static final String NIGHT_THEME = "darkTheme";
     CurrentWeatherFragment currentWeatherFragment;
-    ForecastFragment forecastFragment;
     Button chgCity;
     private boolean nightTheme;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-            if (savedInstanceState != null) {
-                currentWeatherFragment = (CurrentWeatherFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.currentWeather);
-                forecastFragment = (ForecastFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.container);
+        Toolbar toolbar = initToolbar();
+        initDrawer(toolbar);
+        initMain(savedInstanceState);
 
-            } else if (currentWeatherFragment == null && forecastFragment == null) {
-                currentWeatherFragment = new CurrentWeatherFragment();
-                forecastFragment = new ForecastFragment();
-            }
-            if (!currentWeatherFragment.isInLayout()) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.currentWeather, currentWeatherFragment)
-                        .commit();
-            }
-            if (!forecastFragment.isInLayout()) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.container, forecastFragment)
-                        .commit();
-            }
+    }
+
+    private Toolbar initToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        return toolbar;
+    }
+
+    private void initDrawer(Toolbar toolbar) {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+
+
+    private void initMain(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            currentWeatherFragment = (CurrentWeatherFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.currentWeather);
+
+
+        } else if (currentWeatherFragment == null ) {
+            currentWeatherFragment = new CurrentWeatherFragment();
+
+        }
+        if (!currentWeatherFragment.isInLayout()) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.currentWeather, currentWeatherFragment)
+                    .commit();
+        }
+
         chgCity = findViewById(R.id.cityChanger);
         chgCity.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,49 +112,89 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
-
-        navView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.navigation_home:
-                        return true;
-                    case R.id.navigation_dashboard:
-                        Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
-                        startActivityForResult(settingsIntent, REQUEST_CODE_SET);
-                        return true;
-                    case R.id.navigation_notifications:
-                        startActivity(new Intent(getApplicationContext(), AboutActivity.class));
-                        return true;
-                }
-                return false;
-            }
-        });
     }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
 
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return super.onCreateOptionsMenu(menu);
+        // Здесь определяем меню приложения (активити)
+        getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem search = menu.findItem(R.id.action_search); // поиск пункта меню поиска
+        final SearchView searchText = (SearchView) search.getActionView(); // строка поиска
+        searchText.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            // реагирует на конец ввода поиска
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                cityName = query;
+                searchText.onActionViewCollapsed();
+                Toast.makeText(getApplicationContext(), cityName, Toast.LENGTH_LONG).show();
+                fragmentLoading();
+                return true;
+            }
+            // реагирует на нажатие каждой клавиши
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return true;
+            }
+
+
+        });
+
+
+        MenuItem refresh = menu.findItem(R.id.action_refresh);
+        refresh.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (cityName == null) {cityName = "Saint Petersburg,RU";}
+                fragmentLoading();
+                return true;
+            }
+        });
+
+        return true;
     }
 
+
+
+    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        startActivity(new Intent(getApplicationContext(), AboutActivity.class));
-        return super.onOptionsItemSelected(item);
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_home) {
+
+        } else if (id == R.id.nav_history) {
+            startActivity(new Intent(this, CityChangerActivity.class));
+
+        } else if (id == R.id.nav_tools) {
+            startActivity(new Intent(this, SettingsActivity.class));
+        } else if (id == R.id.about_program) {
+            AboutFragment aboutFragment = new AboutFragment();
+            aboutFragment = (AboutFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.currentWeather);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.currentWeather, aboutFragment)
+                    .commit();
+        }
+
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     @Override
@@ -148,18 +202,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK){
             cityName = data.getExtras().getString(CITY_NAME);
-            currentWeatherFragment = (CurrentWeatherFragment)getSupportFragmentManager().findFragmentById(R.id.currentWeather);
-            currentWeatherFragment = CurrentWeatherFragment.create(cityName);
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.currentWeather, currentWeatherFragment)
-                    .commit();
-            forecastFragment = (ForecastFragment)getSupportFragmentManager().findFragmentById(R.id.container);
-            forecastFragment = ForecastFragment.create(cityName);
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.container, forecastFragment)
-                    .commit();
+            fragmentLoading();
         }
         if (resultCode == 100){
             recreate();
@@ -172,6 +215,14 @@ public class MainActivity extends AppCompatActivity {
 //                setTheme(R.style.AppTheme);;
 //            }
         }
+    }
+    private void fragmentLoading(){
+        currentWeatherFragment = (CurrentWeatherFragment)getSupportFragmentManager().findFragmentById(R.id.currentWeather);
+        currentWeatherFragment = CurrentWeatherFragment.create(cityName);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.currentWeather, currentWeatherFragment)
+                .commit();
     }
 
 }

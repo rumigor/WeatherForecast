@@ -1,6 +1,5 @@
 package com.example.weatherforecast.model;
 
-import android.os.Handler;
 import android.util.Log;
 
 import com.example.weatherforecast.BuildConfig;
@@ -8,7 +7,6 @@ import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.stream.Collectors;
 

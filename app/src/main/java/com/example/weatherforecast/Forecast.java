@@ -1,7 +1,5 @@
 package com.example.weatherforecast;
 
-import java.util.ArrayList;
-
 public class Forecast {
     private String day;
     private String dTemp;

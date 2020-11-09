@@ -1,13 +1,10 @@
 package com.example.weatherforecast;
 
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.List;
 
 public class CityHolder extends RecyclerView.ViewHolder {
     private final TextView cityName;
