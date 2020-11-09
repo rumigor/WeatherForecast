@@ -37,22 +37,6 @@
         app:layout_constraintGuide_percent="0.64" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/cityChanger"
-        style="@style/MyButtonStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#CDDC39"
-        android:insetLeft="2dp"
-        android:insetTop="2dp"
-        android:insetRight="2dp"
-        android:insetBottom="2dp"
-        android:text="@string/choose_city"
-        app:layout_constraintBottom_toTopOf="@+id/nav_view"
-        app:layout_constraintEnd_toStartOf="@+id/guideline13"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
-
-    <com.google.android.material.button.MaterialButton
         android:id="@+id/openInternet"
         style="@style/MyButtonStyle"
         android:layout_width="0dp"
@@ -63,15 +47,14 @@
         android:insetRight="2dp"
         android:insetBottom="2dp"
         android:text="@string/more_on_gismeteo"
-        app:layout_constraintBottom_toBottomOf="@+id/cityChanger"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline13"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
 
     <FrameLayout
-        android:id="@+id/currentWeather"
+        android:id="@+id/mainFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
@@ -82,10 +65,4 @@
     </FrameLayout>
 
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline13"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
 </androidx.constraintlayout.widget.ConstraintLayout>

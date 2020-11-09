@@ -20,6 +20,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -29,7 +32,6 @@ public class MainActivity extends AppCompatActivity
     private String cityName;
     private static final String NIGHT_THEME = "darkTheme";
     CurrentWeatherFragment currentWeatherFragment;
-    Button chgCity;
     private boolean nightTheme;
 
     @Override
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity
     private void initMain(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             currentWeatherFragment = (CurrentWeatherFragment)
-                    getSupportFragmentManager().findFragmentById(R.id.currentWeather);
+                    getSupportFragmentManager().findFragmentById(R.id.mainFragment);
 
 
         } else if (currentWeatherFragment == null ) {
@@ -73,18 +75,9 @@ public class MainActivity extends AppCompatActivity
         if (!currentWeatherFragment.isInLayout()) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.currentWeather, currentWeatherFragment)
+                    .replace(R.id.mainFragment, currentWeatherFragment)
                     .commit();
         }
-
-        chgCity = findViewById(R.id.cityChanger);
-        chgCity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, CityChangerActivity.class);
-                startActivityForResult(intent, REQUEST_CODE);
-            }
-        });
 
         final String city;
         if (cityName == null){
@@ -140,6 +133,7 @@ public class MainActivity extends AppCompatActivity
                 cityName = query;
                 searchText.onActionViewCollapsed();
                 Toast.makeText(getApplicationContext(), cityName, Toast.LENGTH_LONG).show();
+
                 fragmentLoading();
                 return true;
             }
@@ -148,11 +142,7 @@ public class MainActivity extends AppCompatActivity
             public boolean onQueryTextChange(String newText) {
                 return true;
             }
-
-
         });
-
-
         MenuItem refresh = menu.findItem(R.id.action_refresh);
         refresh.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -175,19 +165,25 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.mainFragment, currentWeatherFragment)
+                    .commit();
 
         } else if (id == R.id.nav_history) {
-            startActivity(new Intent(this, CityChangerActivity.class));
+            SearchHistory searchHistory = new SearchHistory();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.mainFragment, searchHistory)
+                    .commit();
 
         } else if (id == R.id.nav_tools) {
             startActivity(new Intent(this, SettingsActivity.class));
         } else if (id == R.id.about_program) {
             AboutFragment aboutFragment = new AboutFragment();
-            aboutFragment = (AboutFragment)
-                    getSupportFragmentManager().findFragmentById(R.id.currentWeather);
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.currentWeather, aboutFragment)
+                    .replace(R.id.mainFragment, aboutFragment)
                     .commit();
         }
 
@@ -217,11 +213,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
     private void fragmentLoading(){
-        currentWeatherFragment = (CurrentWeatherFragment)getSupportFragmentManager().findFragmentById(R.id.currentWeather);
+//        currentWeatherFragment = (CurrentWeatherFragment)getSupportFragmentManager().findFragmentById(R.id.mainFragment);
         currentWeatherFragment = CurrentWeatherFragment.create(cityName);
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.currentWeather, currentWeatherFragment)
+                .replace(R.id.mainFragment, currentWeatherFragment)
                 .commit();
     }
 

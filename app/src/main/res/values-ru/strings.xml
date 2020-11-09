@@ -46,4 +46,6 @@
     <string name="menu_gallery">История поиска</string>
     <string name="menu_tools">Настройки</string>
     <string name="search">Поиск</string>
+    <string name="exclamation">Error</string>
+    <string name="button">OK</string>
 </resources>

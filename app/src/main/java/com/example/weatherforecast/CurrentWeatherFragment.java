@@ -1,5 +1,7 @@
 package com.example.weatherforecast;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -27,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -84,6 +87,7 @@ public class CurrentWeatherFragment extends Fragment {
         itemDecoration.setDrawable(requireActivity().getDrawable(R.drawable.separator));
         recyclerView.addItemDecoration(itemDecoration);
         recyclerView.setAdapter(weatherAdapter);
+
     }
 
     private void init(View view){
@@ -92,17 +96,18 @@ public class CurrentWeatherFragment extends Fragment {
         pressure = view.findViewById(R.id.textPressure);
         humidity =view.findViewById(R.id.textHumidity);
         windSpeed = view.findViewById(R.id.textWindspeed);
-        currentWeather = view.findViewById(R.id.currentWeather);
+        currentWeather = view.findViewById(R.id.weatherIco);
         dataLoading(cityName);
     }
 
 
     private void dataLoading(String cityName){
         if (cityName == null){
-            cityName = "Saint Petersburg,RU";
+            cityName = "Saint Petersburg";
         }
         final Handler handler = new Handler();
         final Data data = new Data(cityName);
+        final String finalCityName = cityName;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -143,6 +148,18 @@ public class CurrentWeatherFragment extends Fragment {
                                 forecasts.add(forecast);
                             }
                             weatherAdapter.setDays(forecasts);
+                            ArrayList<String> firstcities = new ArrayList<>();
+                            firstcities.addAll((Arrays.asList(getString(R.string.spb), getString(R.string.vln), getString(R.string.bcn), getString(R.string.msc), getString(R.string.bru))));
+                            Cities cities = Cities.getInstance(firstcities);
+                            boolean notInList = true;
+                            for (int i = 0; i < cities.getCitiesList().size(); i++) {
+                                if (cities.getCitiesList().get(i).equals(finalCityName)) {
+                                    notInList = false;
+                                }
+                            }
+                            if (notInList) {
+                                cities.getCitiesList().add(0, finalCityName);
+                            }
                         }
                     });
                 }
@@ -150,10 +167,26 @@ public class CurrentWeatherFragment extends Fragment {
                     handler.post(new Runnable() {
                                      @Override
                                      public void run() {
-                                         Toast.makeText(getContext(), getString(R.string.cityNotFound), Toast.LENGTH_LONG).show();
+                                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                         builder.setTitle(R.string.exclamation)
+                                                 // Указываем сообщение в окне (также есть вариант со
+                                                 // строковым параметром)
+                                                 .setMessage(R.string.cityNotFound)
+                                                 // Можно указать и пиктограмму
+                                                 .setIcon(R.drawable.title_small)
+                                                 // Из этого окна нельзя выйти кнопкой Back
+                                                 .setCancelable(false)
+                                                 .setPositiveButton(R.string.button,
+                                                         // Ставим слушатель, нажатие будем обрабатывать
+                                                         new DialogInterface.OnClickListener() {
+                                                             public void onClick(DialogInterface dialog, int id) {
+                                                             }
+                                                         });
+
+                                         AlertDialog alert = builder.create();
+                                         alert.show();
                                      }
                                  });
-
                 }
 
             }

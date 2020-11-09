@@ -45,4 +45,6 @@
     <string name="menu_gallery">Search History</string>
     <string name="menu_tools">Tools</string>
     <string name="search">Search</string>
+    <string name="exclamation">Error</string>
+    <string name="button">OK</string>
 </resources>
