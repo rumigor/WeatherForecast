@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="BatteryView">
-        <attr name="battery_color" format="color" />
-        <attr name="level_color" format="color" />
-        <attr name="level" format="integer" />
-        <attr name="level_pressed_color" format="color" />
+
+    <declare-styleable name="Thermometer">
+        <attr name="radius" format="dimension"/>
+        <attr name="outerColor" format="color"/>
+        <attr name="middleColor" format="color"/>
+        <attr name="innerColor" format="color"/>
     </declare-styleable>
 </resources>

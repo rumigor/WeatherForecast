@@ -17,22 +17,19 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.example.weatherforecast.model.OnDialogListener;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private final static int REQUEST_CODE = 0x1FAB;
-    private final static int REQUEST_CODE_SET = 0x2FAB;
+
     private final static String CITY_NAME = "CityName";
-    private String cityName;
-    private static final String NIGHT_THEME = "darkTheme";
+    public static String cityName;
+
     CurrentWeatherFragment currentWeatherFragment;
-    private boolean nightTheme;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,9 +114,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Здесь определяем меню приложения (активити)
@@ -152,23 +146,24 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
-
+        MenuItem tools = menu.findItem(R.id.action_settings);
+        tools.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                loadDialog();
+                return true;
+            }
+        });
         return true;
     }
 
-
-
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.mainFragment, currentWeatherFragment)
-                    .commit();
+            fragmentLoading();
 
         } else if (id == R.id.nav_history) {
             SearchHistory searchHistory = new SearchHistory();
@@ -178,7 +173,7 @@ public class MainActivity extends AppCompatActivity
                     .commit();
 
         } else if (id == R.id.nav_tools) {
-            startActivity(new Intent(this, SettingsActivity.class));
+            loadDialog();
         } else if (id == R.id.about_program) {
             AboutFragment aboutFragment = new AboutFragment();
             getSupportFragmentManager()
@@ -202,18 +197,11 @@ public class MainActivity extends AppCompatActivity
         }
         if (resultCode == 100){
             recreate();
-//            nightTheme = data.getExtras().getBoolean(NIGHT_THEME);
-//            ConstraintLayout layout = findViewById(R.id.mainLayout);
-//            if (nightTheme){
-//                setTheme(R.style.AppDarkTheme);;
-//            }
-//            else {
-//                setTheme(R.style.AppTheme);;
-//            }
+
         }
     }
     private void fragmentLoading(){
-//        currentWeatherFragment = (CurrentWeatherFragment)getSupportFragmentManager().findFragmentById(R.id.mainFragment);
+
         currentWeatherFragment = CurrentWeatherFragment.create(cityName);
         getSupportFragmentManager()
                 .beginTransaction()
@@ -221,4 +209,33 @@ public class MainActivity extends AppCompatActivity
                 .commit();
     }
 
+    private OnDialogListener dialogListener = new OnDialogListener() {
+
+        @Override
+        public void onDialogC() {
+            Metrics metrics = Metrics.getInstance();
+            if (metrics.isFahrenheit()) {
+                metrics.setFahrenheit(false);
+                fragmentLoading();
+            }
+        }
+
+        @Override
+        public void onDialogF() {
+            Metrics metrics = Metrics.getInstance();
+            metrics.setFahrenheit(false);
+            if (!metrics.isFahrenheit()){
+                metrics.setFahrenheit(true);
+                fragmentLoading();
+            }
+        }
+    };
+
+    private void loadDialog(){
+        SettingsDialogFragment settingsDialogFragment =
+                SettingsDialogFragment.newInstance();
+        settingsDialogFragment.setOnDialogListener(dialogListener);
+        settingsDialogFragment.show(getSupportFragmentManager(),
+                "dialog_fragment");
+    }
 }

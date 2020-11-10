@@ -79,7 +79,7 @@ public class SearchHistory extends Fragment {
             @Override
             public void onClicked(String city) {
                 cityName = city;
-
+                MainActivity.cityName = city;
                 currentWeatherFragment = CurrentWeatherFragment.create(cityName);
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()

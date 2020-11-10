@@ -47,4 +47,6 @@
     <string name="search">Search</string>
     <string name="exclamation">Error</string>
     <string name="button">OK</string>
+    <string name="dialog_message">Choose metrics</string>
+    <string name="ok">°C</string>
 </resources>

@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
 public class CurrentWeatherFragment extends Fragment {
 
     private static final String CITY_NAME ="CityName";
-    private static final String TAG = "WEATHER";
-    private static final String WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather?lat=55.75&lon=37.62&appid=";
     private String cityName;
     final WeatherAdapter weatherAdapter = new WeatherAdapter();
 
@@ -50,6 +48,8 @@ public class CurrentWeatherFragment extends Fragment {
     private EditText humidity;
     private EditText windSpeed;
     private ImageView currentWeather;
+    private Thermometer thermometer;
+    private Metrics metrics;
 
 
 
@@ -81,6 +81,7 @@ public class CurrentWeatherFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         init(view);
+        thermometer = view.findViewById(R.id.thermometer);
         final RecyclerView recyclerView = view.findViewById(R.id.weatherRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
         DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity(),  LinearLayoutManager.HORIZONTAL);
@@ -100,7 +101,7 @@ public class CurrentWeatherFragment extends Fragment {
         dataLoading(cityName);
     }
 
-
+    //Загружаем информацию
     private void dataLoading(String cityName){
         if (cityName == null){
             cityName = "Saint Petersburg";
@@ -111,14 +112,15 @@ public class CurrentWeatherFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final WeatherRequest weatherRequest = data.getData();
+                final WeatherRequest weatherRequest = data.getData(); //текущая погода
                 if (weatherRequest != null) {
-                    final ForecastData forecastData = new ForecastData(weatherRequest.getCoord().getLat(), weatherRequest.getCoord().getLon());
-                    final ForecastRequest forecastRequest = forecastData.getData();
+                    final ForecastData forecastData = new ForecastData(weatherRequest.getCoord().getLat(), weatherRequest.getCoord().getLon()); //получаем прогноз погоды по широте и долготе
+                    final ForecastRequest forecastRequest = forecastData.getData(); //прогноз погоды
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
                             try {
+                                metrics = Metrics.getInstance();
                                 displayWeather(weatherRequest);
                                 displayForecast(forecastRequest);
                             } catch (IOException e) {
@@ -126,23 +128,44 @@ public class CurrentWeatherFragment extends Fragment {
                             }
                         }
 
-                        private void displayWeather(WeatherRequest weatherRequest) throws IOException {
+                        private void displayWeather(WeatherRequest weatherRequest) throws IOException { //отображаем погоду, в зависимости от настроек (°С или °F)
+                            if (!metrics.isFahrenheit()) {
+                                thermometer.changeUnit(true);
+                                thermometer.setCurrentTemp(weatherRequest.getMain().getTemp() - 273);
+                                temperature.setText(String.format("%d%s", (int) weatherRequest.getMain().getTemp() - 273, "°C"));
+                            }
+                            else {
+                                thermometer.changeUnit(false);
+                                float temp = (weatherRequest.getMain().getTemp()-273)*1.8f+32;
+                                thermometer.setCurrentTemp(temp);
+                                temperature.setText(String.format("%d%s", (int) temp, "°F"));
+
+                            }
                             city.setText(weatherRequest.getName());
-                            temperature.setText(String.format("%d%s", (int) weatherRequest.getMain().getTemp() - 273, "°C"));
                             pressure.setText(String.format("%d %s", (int) (weatherRequest.getMain().getPressure() / 1.33), getString(R.string.pressureValue)));
                             humidity.setText(String.format("%d%s", weatherRequest.getMain().getHumidity(), "%"));
                             windSpeed.setText(String.format("%d %s", (int) weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue)));
                             Picasso.with(getContext()).load(String.format("http://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon())).into(currentWeather);
                         }
 
-                        private void displayForecast(ForecastRequest forecastRequest1) {
+                        private void displayForecast(ForecastRequest forecastRequest1) { //отображаем прогноз, в зависимости от настроек (°С или °F)
                             ArrayList<Forecast> forecasts = new ArrayList<>();
                             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM", Locale.getDefault());
                             for (int i = 0; i < forecastRequest1.getDaily().length; i++) {
                                 Date date = new Date(forecastRequest1.getDaily()[i].getDt() * 1000);
                                 String dText = sdf.format(date);
-                                String dayTemp = String.format("%d%s", (int) (forecastRequest1.getDaily()[i].getTemp().getDay() - 273), "°C");
-                                String nightTemp = String.format("%d%s", (int) (forecastRequest1.getDaily()[i].getTemp().getNight() - 273), "°C");
+                                String dayTemp;
+                                String nightTemp;
+                                if (!metrics.isFahrenheit()) {
+                                    dayTemp = String.format("%d%s", (int) (forecastRequest1.getDaily()[i].getTemp().getDay() - 273), "°C");
+                                    nightTemp = String.format("%d%s", (int) (forecastRequest1.getDaily()[i].getTemp().getNight() - 273), "°C");
+                                }
+                                else {
+                                    float dTemp = (forecastRequest1.getDaily()[i].getTemp().getDay()-273)*1.8f+32;
+                                    float nTemp = (forecastRequest1.getDaily()[i].getTemp().getNight()-273)*1.8f+32;
+                                    dayTemp = String.format("%d%s", (int) dTemp, "°F");
+                                    nightTemp = String.format("%d%s", (int) nTemp, "°F");
+                                }
                                 String weatherIco = forecastRequest1.getDaily()[i].getWeather()[0].getIcon();
                                 Forecast forecast = new Forecast(dText, dayTemp, nightTemp, weatherIco);
                                 forecasts.add(forecast);
