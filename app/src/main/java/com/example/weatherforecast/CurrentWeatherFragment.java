@@ -145,7 +145,7 @@ public class CurrentWeatherFragment extends Fragment {
                             pressure.setText(String.format("%d %s", (int) (weatherRequest.getMain().getPressure() / 1.33), getString(R.string.pressureValue)));
                             humidity.setText(String.format("%d%s", weatherRequest.getMain().getHumidity(), "%"));
                             windSpeed.setText(String.format("%d %s", (int) weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue)));
-                            String imageURL = String.format("http://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon());
+                            String imageURL = String.format("https://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon());
                             Picasso.with(getContext()).load(imageURL)
                                     .error(R.drawable.cloudy)
                                     .into(currentWeather);
