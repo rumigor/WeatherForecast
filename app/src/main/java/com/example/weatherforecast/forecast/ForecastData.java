@@ -7,12 +7,13 @@ import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class ForecastData {
+public class ForecastData implements Serializable {
     private static final String TAG = "WEATHER";
     private float lat;
     private float lon;

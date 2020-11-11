@@ -1,6 +1,8 @@
 package com.example.weatherforecast.model;
 
-public class WeatherRequest {
+import java.io.Serializable;
+
+public class WeatherRequest implements Serializable {
     private Coord coord;
     private Weather[] weather;
     private Main main;

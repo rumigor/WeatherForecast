@@ -1,6 +1,8 @@
 package com.example.weatherforecast.forecast;
 
-public class ForecastRequest {
+import java.io.Serializable;
+
+public class ForecastRequest implements Serializable {
     private float lat;
     private float lon;
     private Daily [] daily;

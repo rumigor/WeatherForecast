@@ -1,6 +1,8 @@
 package com.example.weatherforecast.forecast;
 
-public class Daily {
+import java.io.Serializable;
+
+public class Daily implements Serializable {
     long dt;
     Temp temp;
     Weather[] weather;

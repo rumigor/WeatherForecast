@@ -1,7 +1,12 @@
 package com.example.weatherforecast;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -40,6 +45,7 @@ public class CurrentWeatherFragment extends Fragment {
     private static final String CITY_NAME ="CityName";
     private String cityName;
     final WeatherAdapter weatherAdapter = new WeatherAdapter();
+    static final String BROADCAST_GET_DATA = "GET_DATA";
 
 
     private EditText city;
@@ -60,6 +66,18 @@ public class CurrentWeatherFragment extends Fragment {
         args.putString(CITY_NAME, cityName);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        requireActivity().registerReceiver(getDataReceiver, new IntentFilter(BROADCAST_GET_DATA));
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        requireActivity().unregisterReceiver(getDataReceiver);
     }
 
     @Override
@@ -89,6 +107,7 @@ public class CurrentWeatherFragment extends Fragment {
         recyclerView.addItemDecoration(itemDecoration);
         recyclerView.setAdapter(weatherAdapter);
 
+
     }
 
     private void init(View view){
@@ -106,117 +125,113 @@ public class CurrentWeatherFragment extends Fragment {
         if (cityName == null){
             cityName = "Saint Petersburg";
         }
-        final Handler handler = new Handler();
-        final Data data = new Data(cityName);
-        final String finalCityName = cityName;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final WeatherRequest weatherRequest = data.getData(); //текущая погода
-                if (weatherRequest != null) {
-                    final ForecastData forecastData = new ForecastData(weatherRequest.getCoord().getLat(), weatherRequest.getCoord().getLon()); //получаем прогноз погоды по широте и долготе
-                    final ForecastRequest forecastRequest = forecastData.getData(); //прогноз погоды
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                metrics = Metrics.getInstance();
-                                displayWeather(weatherRequest);
-                                displayForecast(forecastRequest);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+        GetDataService.startGetDataService(getContext(), cityName);
+    }
+    private BroadcastReceiver getDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final WeatherRequest weatherRequest = (WeatherRequest) intent.getSerializableExtra(GetDataService.CURRENT_WEATHER);
+            final ForecastRequest forecastRequest = (ForecastRequest) intent.getSerializableExtra(GetDataService.FORECAST_DATA);
+            final Handler handler = new Handler();
+            if (weatherRequest == null || forecastRequest == null){
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setTitle(R.string.exclamation)
+                                // Указываем сообщение в окне (также есть вариант со
+                                // строковым параметром)
+                                .setMessage(R.string.cityNotFound)
+                                // Можно указать и пиктограмму
+                                .setIcon(R.drawable.title_small)
+                                // Из этого окна нельзя выйти кнопкой Back
+                                .setCancelable(false)
+                                .setPositiveButton(R.string.button,
+                                        // Ставим слушатель, нажатие будем обрабатывать
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                            }
+                                        });
+
+                        AlertDialog alert = builder.create();
+                        alert.show();
+                    }
+                });
+            }
+            else{
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        metrics = Metrics.getInstance();
+                        try {
+                            displayWeather(weatherRequest);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-
-                        private void displayWeather(WeatherRequest weatherRequest) throws IOException { //отображаем погоду, в зависимости от настроек (°С или °F)
-                            if (!metrics.isFahrenheit()) {
-                                thermometer.changeUnit(true);
-                                thermometer.setCurrentTemp(weatherRequest.getMain().getTemp() - 273);
-                                temperature.setText(String.format("%d%s", (int) weatherRequest.getMain().getTemp() - 273, "°C"));
-                            }
-                            else {
-                                thermometer.changeUnit(false);
-                                float temp = (weatherRequest.getMain().getTemp()-273)*1.8f+32;
-                                thermometer.setCurrentTemp(temp);
-                                temperature.setText(String.format("%d%s", (int) temp, "°F"));
-
-                            }
-                            city.setText(weatherRequest.getName());
-                            pressure.setText(String.format("%d %s", (int) (weatherRequest.getMain().getPressure() / 1.33), getString(R.string.pressureValue)));
-                            humidity.setText(String.format("%d%s", weatherRequest.getMain().getHumidity(), "%"));
-                            windSpeed.setText(String.format("%d %s", (int) weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue)));
-                            String imageURL = String.format("https://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon());
-                            Picasso.with(getContext()).load(imageURL)
-                                    .error(R.drawable.cloudy)
-                                    .into(currentWeather);
-                        }
-
-                        private void displayForecast(ForecastRequest forecastRequest1) { //отображаем прогноз, в зависимости от настроек (°С или °F)
-                            ArrayList<Forecast> forecasts = new ArrayList<>();
-                            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM", Locale.getDefault());
-                            for (int i = 0; i < forecastRequest1.getDaily().length; i++) {
-                                Date date = new Date(forecastRequest1.getDaily()[i].getDt() * 1000);
-                                String dText = sdf.format(date);
-                                String dayTemp;
-                                String nightTemp;
-                                if (!metrics.isFahrenheit()) {
-                                    dayTemp = String.format("%d%s", (int) (forecastRequest1.getDaily()[i].getTemp().getDay() - 273), "°C");
-                                    nightTemp = String.format("%d%s", (int) (forecastRequest1.getDaily()[i].getTemp().getNight() - 273), "°C");
-                                }
-                                else {
-                                    float dTemp = (forecastRequest1.getDaily()[i].getTemp().getDay()-273)*1.8f+32;
-                                    float nTemp = (forecastRequest1.getDaily()[i].getTemp().getNight()-273)*1.8f+32;
-                                    dayTemp = String.format("%d%s", (int) dTemp, "°F");
-                                    nightTemp = String.format("%d%s", (int) nTemp, "°F");
-                                }
-                                String weatherIco = forecastRequest1.getDaily()[i].getWeather()[0].getIcon();
-                                Forecast forecast = new Forecast(dText, dayTemp, nightTemp, weatherIco);
-                                forecasts.add(forecast);
-                            }
-                            weatherAdapter.setDays(forecasts);
-                            ArrayList<String> firstcities = new ArrayList<>();
-                            firstcities.addAll((Arrays.asList(getString(R.string.spb), getString(R.string.vln), getString(R.string.bcn), getString(R.string.msc), getString(R.string.bru))));
-                            Cities cities = Cities.getInstance(firstcities);
-                            boolean notInList = true;
-                            for (int i = 0; i < cities.getCitiesList().size(); i++) {
-                                if (cities.getCitiesList().get(i).equals(finalCityName)) {
-                                    notInList = false;
-                                }
-                            }
-                            if (notInList) {
-                                cities.getCitiesList().add(0, finalCityName);
-                            }
-                        }
-                    });
-                }
-                else {
-                    handler.post(new Runnable() {
-                                     @Override
-                                     public void run() {
-                                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                         builder.setTitle(R.string.exclamation)
-                                                 // Указываем сообщение в окне (также есть вариант со
-                                                 // строковым параметром)
-                                                 .setMessage(R.string.cityNotFound)
-                                                 // Можно указать и пиктограмму
-                                                 .setIcon(R.drawable.title_small)
-                                                 // Из этого окна нельзя выйти кнопкой Back
-                                                 .setCancelable(false)
-                                                 .setPositiveButton(R.string.button,
-                                                         // Ставим слушатель, нажатие будем обрабатывать
-                                                         new DialogInterface.OnClickListener() {
-                                                             public void onClick(DialogInterface dialog, int id) {
-                                                             }
-                                                         });
-
-                                         AlertDialog alert = builder.create();
-                                         alert.show();
-                                     }
-                                 });
-                }
+                        displayForecast(forecastRequest);
+                    }
+                });
 
             }
-        }).start();
+        }
+    };
+    private void displayWeather(WeatherRequest weatherRequest) throws IOException { //отображаем погоду, в зависимости от настроек (°С или °F)
+        if (!metrics.isFahrenheit()) {
+            thermometer.changeUnit(true);
+            thermometer.setCurrentTemp(weatherRequest.getMain().getTemp() - 273);
+            temperature.setText(String.format("%d%s", (int) weatherRequest.getMain().getTemp() - 273, "°C"));
+        }
+        else {
+            thermometer.changeUnit(false);
+            float temp = (weatherRequest.getMain().getTemp()-273)*1.8f+32;
+            thermometer.setCurrentTemp(temp);
+            temperature.setText(String.format("%d%s", (int) temp, "°F"));
+
+        }
+        city.setText(weatherRequest.getName());
+        pressure.setText(String.format("%d %s", (int) (weatherRequest.getMain().getPressure() / 1.33), getString(R.string.pressureValue)));
+        humidity.setText(String.format("%d%s", weatherRequest.getMain().getHumidity(), "%"));
+        windSpeed.setText(String.format("%d %s", (int) weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue)));
+        String imageURL = String.format("https://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon());
+        Picasso.with(getContext()).load(imageURL)
+                .error(R.drawable.cloudy)
+                .into(currentWeather);
     }
 
+    private void displayForecast(ForecastRequest forecastRequest1) { //отображаем прогноз, в зависимости от настроек (°С или °F)
+        ArrayList<Forecast> forecasts = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM", Locale.getDefault());
+        for (int i = 0; i < forecastRequest1.getDaily().length; i++) {
+            Date date = new Date(forecastRequest1.getDaily()[i].getDt() * 1000);
+            String dText = sdf.format(date);
+            String dayTemp;
+            String nightTemp;
+            if (!metrics.isFahrenheit()) {
+                dayTemp = String.format("%d%s", (int) (forecastRequest1.getDaily()[i].getTemp().getDay() - 273), "°C");
+                nightTemp = String.format("%d%s", (int) (forecastRequest1.getDaily()[i].getTemp().getNight() - 273), "°C");
+            }
+            else {
+                float dTemp = (forecastRequest1.getDaily()[i].getTemp().getDay()-273)*1.8f+32;
+                float nTemp = (forecastRequest1.getDaily()[i].getTemp().getNight()-273)*1.8f+32;
+                dayTemp = String.format("%d%s", (int) dTemp, "°F");
+                nightTemp = String.format("%d%s", (int) nTemp, "°F");
+            }
+            String weatherIco = forecastRequest1.getDaily()[i].getWeather()[0].getIcon();
+            Forecast forecast = new Forecast(dText, dayTemp, nightTemp, weatherIco);
+            forecasts.add(forecast);
+        }
+        weatherAdapter.setDays(forecasts);
+        ArrayList<String> firstcities = new ArrayList<>();
+        firstcities.addAll((Arrays.asList(getString(R.string.spb), getString(R.string.vln), getString(R.string.bcn), getString(R.string.msc), getString(R.string.bru))));
+        Cities cities = Cities.getInstance(firstcities);
+        boolean notInList = true;
+        for (int i = 0; i < cities.getCitiesList().size(); i++) {
+            if (cities.getCitiesList().get(i).equals(cityName)) {
+                notInList = false;
+            }
+        }
+        if (notInList) {
+            cities.getCitiesList().add(0, cityName);
+        }
+    }
 }
