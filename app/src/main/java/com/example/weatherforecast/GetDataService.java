@@ -12,8 +12,6 @@ import com.example.weatherforecast.model.WeatherRequest;
 import com.google.gson.Gson;
 
 public class GetDataService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     private static final String ACTION_LOAD_DATA = "LOAD_DATA";
     static final String CURRENT_WEATHER = "CURRENT_WEATHER";
     static final String FORECAST_DATA = "FORECAST_DATA";
@@ -55,14 +53,16 @@ public class GetDataService extends IntentService {
     private void handleActionLoadData(String city) {
         String url = String.format("https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", city, BuildConfig.WEATHER_API_KEY);
         GetData getData = new GetData(url);
-        Gson gson = new Gson();
-        weatherRequest = gson.fromJson(getData.loadData(), WeatherRequest.class);
-        if (weatherRequest != null){
-            url = String.format("https://api.openweathermap.org/data/2.5/onecall?lat=%s&lon=%s&exclude=current,minutely,hourly,alerts&appid=%s", weatherRequest.getCoord().getLat(), weatherRequest.getCoord().getLon(), BuildConfig.WEATHER_API_KEY);
-            getData = new GetData(url);
-            forecastRequest = gson.fromJson(getData.loadData(), ForecastRequest.class);
-            makeNote(((int)weatherRequest.getMain().getTemp()+"°C"));
-            sendBrodcast(weatherRequest, forecastRequest);
+        if (!getData.loadData().equals("error")) {
+            Gson gson = new Gson();
+            weatherRequest = gson.fromJson(getData.loadData(), WeatherRequest.class);
+            if (weatherRequest != null) {
+                url = String.format("https://api.openweathermap.org/data/2.5/onecall?lat=%s&lon=%s&exclude=current,minutely,hourly,alerts&appid=%s", weatherRequest.getCoord().getLat(), weatherRequest.getCoord().getLon(), BuildConfig.WEATHER_API_KEY);
+                getData = new GetData(url);
+                forecastRequest = gson.fromJson(getData.loadData(), ForecastRequest.class);
+                makeNote(city + " " + ((int) weatherRequest.getMain().getTemp() - 273 + "°C"));
+                sendBrodcast(weatherRequest, forecastRequest);
+            }
         }
         else {
             makeNote(getString(R.string.cityNotFound));

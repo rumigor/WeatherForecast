@@ -1,21 +1,22 @@
 package com.example.weatherforecast;
 
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,20 +25,16 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.weatherforecast.forecast.ForecastData;
 import com.example.weatherforecast.forecast.ForecastRequest;
-import com.example.weatherforecast.model.Data;
 import com.example.weatherforecast.model.WeatherRequest;
 import com.squareup.picasso.Picasso;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 
 public class CurrentWeatherFragment extends Fragment {
@@ -99,6 +96,7 @@ public class CurrentWeatherFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         init(view);
+        initNotificationChannel();
         thermometer = view.findViewById(R.id.thermometer);
         final RecyclerView recyclerView = view.findViewById(R.id.weatherRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
@@ -225,13 +223,25 @@ public class CurrentWeatherFragment extends Fragment {
         firstcities.addAll((Arrays.asList(getString(R.string.spb), getString(R.string.vln), getString(R.string.bcn), getString(R.string.msc), getString(R.string.bru))));
         Cities cities = Cities.getInstance(firstcities);
         boolean notInList = true;
-        for (int i = 0; i < cities.getCitiesList().size(); i++) {
-            if (cities.getCitiesList().get(i).equals(cityName)) {
-                notInList = false;
+        if (cityName != null) {
+            for (int i = 0; i < cities.getCitiesList().size(); i++) {
+                if (cities.getCitiesList().get(i).equals(cityName)) {
+                    notInList = false;
+                }
+            }
+            if (notInList) {
+                cities.getCitiesList().add(0, cityName);
             }
         }
-        if (notInList) {
-            cities.getCitiesList().add(0, cityName);
+    }
+
+    private void initNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) requireActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel mChannel = new NotificationChannel("2", "Weather", importance);
+            notificationManager.createNotificationChannel(mChannel);
         }
     }
+
 }
