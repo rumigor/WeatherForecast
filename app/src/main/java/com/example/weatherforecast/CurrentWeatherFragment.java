@@ -20,6 +20,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 
 public class CurrentWeatherFragment extends Fragment {
@@ -101,7 +103,7 @@ public class CurrentWeatherFragment extends Fragment {
         final RecyclerView recyclerView = view.findViewById(R.id.weatherRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
         DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity(),  LinearLayoutManager.HORIZONTAL);
-        itemDecoration.setDrawable(requireActivity().getDrawable(R.drawable.separator));
+        itemDecoration.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(requireActivity(), R.drawable.separator)));
         recyclerView.addItemDecoration(itemDecoration);
         recyclerView.setAdapter(weatherAdapter);
 
@@ -125,7 +127,7 @@ public class CurrentWeatherFragment extends Fragment {
         }
         GetDataService.startGetDataService(getContext(), cityName);
     }
-    private BroadcastReceiver getDataReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver getDataReceiver = new BroadcastReceiver() { //получаем данные от сервиса
         @Override
         public void onReceive(Context context, Intent intent) {
             final WeatherRequest weatherRequest = (WeatherRequest) intent.getSerializableExtra(GetDataService.CURRENT_WEATHER);
@@ -137,15 +139,10 @@ public class CurrentWeatherFragment extends Fragment {
                     public void run() {
                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                         builder.setTitle(R.string.exclamation)
-                                // Указываем сообщение в окне (также есть вариант со
-                                // строковым параметром)
                                 .setMessage(R.string.cityNotFound)
-                                // Можно указать и пиктограмму
                                 .setIcon(R.drawable.title_small)
-                                // Из этого окна нельзя выйти кнопкой Back
                                 .setCancelable(false)
                                 .setPositiveButton(R.string.button,
-                                        // Ставим слушатель, нажатие будем обрабатывать
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
                                             }
@@ -219,8 +216,7 @@ public class CurrentWeatherFragment extends Fragment {
             forecasts.add(forecast);
         }
         weatherAdapter.setDays(forecasts);
-        ArrayList<String> firstcities = new ArrayList<>();
-        firstcities.addAll((Arrays.asList(getString(R.string.spb), getString(R.string.vln), getString(R.string.bcn), getString(R.string.msc), getString(R.string.bru))));
+        ArrayList<String> firstcities = new ArrayList<>((Arrays.asList(getString(R.string.spb), getString(R.string.vln), getString(R.string.bcn), getString(R.string.msc), getString(R.string.bru))));
         Cities cities = Cities.getInstance(firstcities);
         boolean notInList = true;
         if (cityName != null) {

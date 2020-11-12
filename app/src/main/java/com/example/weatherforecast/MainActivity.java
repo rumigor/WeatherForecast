@@ -1,9 +1,6 @@
 package com.example.weatherforecast;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -20,9 +17,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.example.weatherforecast.forecast.ForecastRequest;
 import com.example.weatherforecast.model.OnDialogListener;
-import com.example.weatherforecast.model.WeatherRequest;
 import com.google.android.material.navigation.NavigationView;
 
 
@@ -36,17 +31,7 @@ public class MainActivity extends AppCompatActivity
 
     CurrentWeatherFragment currentWeatherFragment;
 
-    @Override
-    protected void onStart() {
-        super.onStart();
 
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,6 +172,7 @@ public class MainActivity extends AppCompatActivity
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.mainFragment, searchHistory)
+                    .addToBackStack("HISTORY")
                     .commit();
 
         } else if (id == R.id.nav_tools) {
@@ -196,6 +182,7 @@ public class MainActivity extends AppCompatActivity
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.mainFragment, aboutFragment)
+                    .addToBackStack("ABOUT_PROGRAM")
                     .commit();
         }
 
@@ -223,6 +210,7 @@ public class MainActivity extends AppCompatActivity
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.mainFragment, currentWeatherFragment)
+                .addToBackStack("WEATHER_FRAGMENT")
                 .commit();
     }
 
@@ -256,14 +244,5 @@ public class MainActivity extends AppCompatActivity
                 "dialog_fragment");
     }
 
-    private BroadcastReceiver getDataReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final WeatherRequest weatherRequest = (WeatherRequest) intent.getSerializableExtra(GetDataService.CURRENT_WEATHER);
-            final ForecastRequest forecastRequest = (ForecastRequest) intent.getSerializableExtra(GetDataService.FORECAST_DATA);
-
-
-        }
-    };
 
 }

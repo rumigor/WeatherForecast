@@ -83,7 +83,7 @@ public class GetDataService extends IntentService {
         notificationManager.notify(1, builder.build());
     }
 
-    private void sendBrodcast(WeatherRequest weatherRequest, ForecastRequest forecastRequest) {
+    private void sendBrodcast(WeatherRequest weatherRequest, ForecastRequest forecastRequest) { //отправляем данные клиенту
         Intent broadcastIntent = new Intent(CurrentWeatherFragment.BROADCAST_GET_DATA);
         broadcastIntent.putExtra(CURRENT_WEATHER, weatherRequest).putExtra(FORECAST_DATA, forecastRequest);
         sendBroadcast(broadcastIntent);
