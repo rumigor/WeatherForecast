@@ -9,13 +9,19 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.weatherforecast.forecast.ForecastRequest;
 import com.example.weatherforecast.model.WeatherRequest;
-import com.google.gson.Gson;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GetDataService extends IntentService {
     private static final String ACTION_LOAD_DATA = "LOAD_DATA";
     static final String CURRENT_WEATHER = "CURRENT_WEATHER";
     static final String FORECAST_DATA = "FORECAST_DATA";
-
+    private CurrentWeatherRetrofit currentWeatherRetrofit;
+    private ForecastRetrofit forecastRetrofit;
     private WeatherRequest weatherRequest;
     private ForecastRequest forecastRequest;
 
@@ -51,26 +57,8 @@ public class GetDataService extends IntentService {
 
 
     private void handleActionLoadData(String city) {
-        String url = String.format("https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", city, BuildConfig.WEATHER_API_KEY);
-        GetData getData = new GetData(url);
-        if (!getData.loadData().equals("error")) {
-            Gson gson = new Gson();
-            weatherRequest = gson.fromJson(getData.loadData(), WeatherRequest.class);
-            if (weatherRequest != null) {
-                url = String.format("https://api.openweathermap.org/data/2.5/onecall?lat=%s&lon=%s&exclude=current,minutely,hourly,alerts&appid=%s", weatherRequest.getCoord().getLat(), weatherRequest.getCoord().getLon(), BuildConfig.WEATHER_API_KEY);
-                getData = new GetData(url);
-                forecastRequest = gson.fromJson(getData.loadData(), ForecastRequest.class);
-                makeNote(city + " " + ((int) weatherRequest.getMain().getTemp() - 273 + "°C"));
-                sendBrodcast(weatherRequest, forecastRequest);
-            }
-        }
-        else {
-            makeNote(getString(R.string.cityNotFound));
-            sendBrodcast(weatherRequest, forecastRequest);
-        }
-
-
-
+        initRetorfit();
+        requestCurrentWeatherRetrofit(city, BuildConfig.WEATHER_API_KEY);
     }
 
     private void makeNote(String message){
@@ -88,6 +76,54 @@ public class GetDataService extends IntentService {
         broadcastIntent.putExtra(CURRENT_WEATHER, weatherRequest).putExtra(FORECAST_DATA, forecastRequest);
         sendBroadcast(broadcastIntent);
     }
+    private void initRetorfit(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.openweathermap.org/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        currentWeatherRetrofit = retrofit.create(CurrentWeatherRetrofit.class);
+        forecastRetrofit = retrofit.create(ForecastRetrofit.class);
+    }
 
+
+    private void requestCurrentWeatherRetrofit(String city, String keyApi){
+        currentWeatherRetrofit.loadWeather(city, keyApi)
+                .enqueue(new Callback<WeatherRequest>() {
+                    @Override
+                    public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
+                        if (response.body() != null) {
+                            weatherRequest = response.body();
+                            String exclude = "current,minutely,hourly,alerts";
+                            requestForecastRetrofit(weatherRequest.getCoord().getLat(), weatherRequest.getCoord().getLon(), exclude);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<WeatherRequest> call, Throwable t) {
+                        makeNote(getString(R.string.cityNotFound));
+                        sendBrodcast(null, null);
+                    }
+                });
+    }
+
+    private void requestForecastRetrofit(float lat, float lon, String exclude){
+        forecastRetrofit.loadWeather(lat, lon, exclude, BuildConfig.WEATHER_API_KEY)
+                .enqueue(new Callback<ForecastRequest>() {
+                    @Override
+                    public void onResponse(Call<ForecastRequest> call, Response<ForecastRequest> response) {
+                        if (response.body() != null) {
+                            forecastRequest = response.body();
+                            makeNote(weatherRequest.getName() + " " + ((int) weatherRequest.getMain().getTemp() - 273 + "°C"));
+                            sendBrodcast(weatherRequest, forecastRequest);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ForecastRequest> call, Throwable t) {
+                        makeNote(getString(R.string.cityNotFound));
+                        sendBrodcast(null, null);
+                    }
+                });
+    }
 
 }

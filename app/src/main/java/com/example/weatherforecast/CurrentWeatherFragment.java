@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -239,5 +240,8 @@ public class CurrentWeatherFragment extends Fragment {
             notificationManager.createNotificationChannel(mChannel);
         }
     }
+
+
+
 
 }
