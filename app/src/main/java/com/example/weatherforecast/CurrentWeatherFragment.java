@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,6 +39,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 public class CurrentWeatherFragment extends Fragment {
@@ -85,6 +88,10 @@ public class CurrentWeatherFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             cityName = getArguments().getString(CITY_NAME);
+        }
+        else {
+            SharedPreferences sharedPref = requireActivity().getPreferences(MODE_PRIVATE);
+            cityName = sharedPref.getString(CITY_NAME, cityName);
         }
     }
 

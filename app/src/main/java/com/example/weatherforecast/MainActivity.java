@@ -1,6 +1,7 @@
 package com.example.weatherforecast;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
+        SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
+        cityName = sharedPref.getString(CITY_NAME, null);
         initMain(savedInstanceState);
 
     }
@@ -129,7 +132,9 @@ public class MainActivity extends AppCompatActivity
                 cityName = query;
                 searchText.onActionViewCollapsed();
                 Toast.makeText(getApplicationContext(), cityName, Toast.LENGTH_LONG).show();
-
+                SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString(CITY_NAME, cityName).commit();
                 fragmentLoading();
                 return true;
             }

@@ -1,5 +1,7 @@
 package com.example.weatherforecast;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,11 +21,7 @@ import java.util.List;
 
 public class SearchHistory extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-
-
-
+    private final static String CITY_NAME = "CityName";
     private String cityName;
      final CityAdapter cityAdapter = new CityAdapter();
     private Cities cities;
@@ -68,6 +66,9 @@ public class SearchHistory extends Fragment {
             public void onClicked(String city) {
                 cityName = city;
                 MainActivity.cityName = city;
+                SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(CITY_NAME, cityName).commit();
                 currentWeatherFragment = CurrentWeatherFragment.create(cityName);
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
