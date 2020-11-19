@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
-    private List<String> cities;
+    private List<CitiesList> cities;
     private OnCityClickListener onCityClickListener;
 
-    public void setCities(List<String> cities) {
+    public void setCities(List<CitiesList> cities) {
         this.cities = cities;
         notifyDataSetChanged();
     }

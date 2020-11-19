@@ -30,12 +30,7 @@ public class SearchHistory extends Fragment {
 
     CurrentWeatherFragment currentWeatherFragment;
 
-    public SearchHistory() {
-        // Required empty public constructor
-    }
-
-
-    // TODO: Rename and change types and number of parameters
+    public SearchHistory() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,7 +41,6 @@ public class SearchHistory extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_search_history, container, false);
     }
 
