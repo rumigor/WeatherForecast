@@ -22,6 +22,14 @@ public class CityHolder extends RecyclerView.ViewHolder {
         return cityName;
     }
 
+    public TextView getLastTemp() {
+        return lastTemp;
+    }
+
+    public TextView getLastDate() {
+        return lastDate;
+    }
+
     void bind(final CitiesList cities, final CityAdapter.OnCityClickListener onCityClickListener) {
         cityName.setText(cities.getCity());
         lastTemp.setText(cities.getTemp());

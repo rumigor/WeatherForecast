@@ -21,5 +21,5 @@ public class Story {
     public float temperature;
 
     @ColumnInfo
-    public Date date;
+    public long date;
 }

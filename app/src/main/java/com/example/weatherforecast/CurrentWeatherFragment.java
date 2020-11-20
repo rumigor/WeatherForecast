@@ -59,6 +59,7 @@ public class CurrentWeatherFragment extends Fragment {
     private ImageView currentWeather;
     private Thermometer thermometer;
     private Metrics metrics;
+    private StorySource storySource;
 
 
 
@@ -183,6 +184,7 @@ public class CurrentWeatherFragment extends Fragment {
             thermometer.changeUnit(true);
             thermometer.setCurrentTemp(weatherRequest.getMain().getTemp() - 273);
             temperature.setText(String.format("%d%s", (int) weatherRequest.getMain().getTemp() - 273, "°C"));
+            storySource.addStory(new GetStoryData(weatherRequest).UpdateStory());
         }
         else {
             thermometer.changeUnit(false);
@@ -196,7 +198,7 @@ public class CurrentWeatherFragment extends Fragment {
         humidity.setText(String.format("%d%s", weatherRequest.getMain().getHumidity(), "%"));
         windSpeed.setText(String.format("%d %s", (int) weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue)));
         String imageURL = String.format("https://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon());
-        Picasso.with(getContext()).load(imageURL)
+        Picasso.get().load(imageURL)
                 .error(R.drawable.cloudy)
                 .into(currentWeather);
     }

@@ -5,6 +5,12 @@ public class CitiesList {
     private String temp;
     private String date;
 
+    public CitiesList(String city, String temp, String date) {
+        this.city = city;
+        this.temp = temp;
+        this.date = date;
+    }
+
     public String getCity() {
         return city;
     }

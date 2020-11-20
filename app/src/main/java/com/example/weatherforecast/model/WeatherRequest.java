@@ -9,7 +9,15 @@ public class WeatherRequest implements Serializable {
     private Wind wind;
     private Clouds clouds;
     private String name;
+    private long dt;
 
+    public long getDt() {
+        return dt;
+    }
+
+    public void setDt(long dt) {
+        this.dt = dt;
+    }
 
     public Coord getCoord() {
         return coord;

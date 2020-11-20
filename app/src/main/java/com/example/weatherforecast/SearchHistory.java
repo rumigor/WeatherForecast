@@ -1,5 +1,6 @@
 package com.example.weatherforecast;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,6 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.weatherforecast.roomDataBase.App;
+import com.example.weatherforecast.roomDataBase.StoryDao;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,9 +27,10 @@ public class SearchHistory extends Fragment {
 
     private final static String CITY_NAME = "CityName";
     private String cityName;
-     final CityAdapter cityAdapter = new CityAdapter();
-    private Cities cities;
-    private List<String> citiesNew = new ArrayList<String>();
+    private CityAdapter cityAdapter;
+    private CitiesList cities;
+    private List<CitiesList> citiesNew = new ArrayList<CitiesList>();
+    private StorySource storySource;
     private static final String NIGHT_THEME = "darkTheme";
 
     CurrentWeatherFragment currentWeatherFragment;
@@ -47,32 +52,34 @@ public class SearchHistory extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ArrayList<String> firstcities = new ArrayList<>();
-        firstcities.addAll((Arrays.asList(getString(R.string.spb), getString(R.string.vln), getString(R.string.bcn), getString(R.string.msc), getString(R.string.bru))));
-        cities = Cities.getInstance(firstcities);
-        citiesNew.addAll(cities.getCitiesList());
-        final RecyclerView recyclerView = view.findViewById(R.id.cityRecycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
-        recyclerView.setAdapter(cityAdapter);
+        ArrayList<CitiesList> firstcities = new ArrayList<>();
+        firstcities.addAll((Arrays.asList(new CitiesList("Saint Petersburg", "N/A", "N/A"))));
+        initRecyclerView(view);
         updateCities(citiesNew);
-        cityAdapter.setOnCityClickListener(new CityAdapter.OnCityClickListener() {
-            @Override
-            public void onClicked(String city) {
-                cityName = city;
-                MainActivity.cityName = city;
-                SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(CITY_NAME, cityName).commit();
-                currentWeatherFragment = CurrentWeatherFragment.create(cityName);
-                getActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.mainFragment, currentWeatherFragment)
-                        .commit();
-            }
+        cityAdapter.setOnCityClickListener(city -> {
+            cityName = city;
+            MainActivity.cityName = city;
+            SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(CITY_NAME, cityName).commit();
+            currentWeatherFragment = CurrentWeatherFragment.create(cityName);
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.mainFragment, currentWeatherFragment)
+                    .commit();
         });
     }
-
-    private void updateCities(List<String> cities) {
+    private void initRecyclerView(View view){
+        final RecyclerView recyclerView = view.findViewById(R.id.cityRecycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+        StoryDao storyDao = App
+                .getInstance()
+                .getStoryDao();
+        storySource = new StorySource(storyDao);
+        cityAdapter = new CityAdapter(requireActivity(), storySource);
+        recyclerView.setAdapter(cityAdapter);
+    }
+    private void updateCities(List<CitiesList> cities) {
         cityAdapter.setCities(cities);
     }
 }
