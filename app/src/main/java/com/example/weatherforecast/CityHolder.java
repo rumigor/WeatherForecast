@@ -6,6 +6,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.weatherforecast.roomDataBase.Story;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class CityHolder extends RecyclerView.ViewHolder {
     private final TextView cityName;
     private final TextView lastTemp;
@@ -18,27 +23,18 @@ public class CityHolder extends RecyclerView.ViewHolder {
         lastDate = itemView.findViewById(R.id.lastDate);
     }
 
-    public TextView getCityName() {
-        return cityName;
-    }
 
-    public TextView getLastTemp() {
-        return lastTemp;
-    }
-
-    public TextView getLastDate() {
-        return lastDate;
-    }
-
-    void bind(final CitiesList cities, final CityAdapter.OnCityClickListener onCityClickListener) {
-        cityName.setText(cities.getCity());
-        lastTemp.setText(cities.getTemp());
-        lastDate.setText(cities.getDate());
+    void bind(final Story cities, final CityAdapter.OnCityClickListener onCityClickListener) {
+        cityName.setText(cities.city);
+        lastTemp.setText((int)cities.temperature-273+"°C");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date(cities.date*1000);
+        lastDate.setText(sdf.format(date));
          cityName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (onCityClickListener != null) {
-                    onCityClickListener.onClicked(cities.getCity());
+                    onCityClickListener.onClicked(cities.city);
                 }
             }
         });

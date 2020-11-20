@@ -2,6 +2,7 @@ package com.example.weatherforecast;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weatherforecast.roomDataBase.Story;
 
+import java.util.Collections;
 import java.util.List;
 
 public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
@@ -45,23 +47,9 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
     @Override
     public void onBindViewHolder(@NonNull CityHolder holder, int position) {
         List<Story> citiesList = storySource.getStoryList();
+        Collections.reverse(citiesList);
         Story story = citiesList.get(position);
-        holder.getCityName().setText(story.city);
-        holder.getLastTemp().setText((int)story.temperature + "°");
-        holder.getLastDate().setText((int)story.date);
-        holder.bind(cities.get(position), onCityClickListener);
-
-
-//        // Тут определяем, какой пункт меню был нажат
-//        holder.itemView.setOnLongClickListener(view -> {
-//            menuPosition = position;
-//            return false;
-//        });
-//
-//        // Регистрируем контекстное меню
-//        if (activity != null){
-//            activity.registerForContextMenu(holder.itemView);
-//        }
+        holder.bind(story, onCityClickListener);
 
     }
 

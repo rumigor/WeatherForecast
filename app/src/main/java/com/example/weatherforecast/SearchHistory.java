@@ -52,8 +52,6 @@ public class SearchHistory extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ArrayList<CitiesList> firstcities = new ArrayList<>();
-        firstcities.addAll((Arrays.asList(new CitiesList("Saint Petersburg", "N/A", "N/A"))));
         initRecyclerView(view);
         updateCities(citiesNew);
         cityAdapter.setOnCityClickListener(city -> {
