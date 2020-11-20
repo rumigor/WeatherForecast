@@ -30,6 +30,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weatherforecast.forecast.ForecastRequest;
 import com.example.weatherforecast.model.WeatherRequest;
+import com.example.weatherforecast.roomDataBase.App;
+import com.example.weatherforecast.roomDataBase.StoryDao;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -184,6 +186,10 @@ public class CurrentWeatherFragment extends Fragment {
             thermometer.changeUnit(true);
             thermometer.setCurrentTemp(weatherRequest.getMain().getTemp() - 273);
             temperature.setText(String.format("%d%s", (int) weatherRequest.getMain().getTemp() - 273, "°C"));
+            StoryDao storyDao = App
+                    .getInstance()
+                    .getStoryDao();
+            storySource = new StorySource(storyDao);
             storySource.addStory(new GetStoryData(weatherRequest).UpdateStory());
         }
         else {
