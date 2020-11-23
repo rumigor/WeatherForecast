@@ -28,7 +28,12 @@ public class CityHolder extends RecyclerView.ViewHolder {
 
     void bind(final Story cities, final CityAdapter.OnCityClickListener onCityClickListener, final int position, Activity activity) {
         cityName.setText(cities.city);
-        lastTemp.setText((int)cities.temperature-273+"°C");
+        if (Metrics.getInstance().isFahrenheit()){
+            lastTemp.setText((int)((cities.temperature-273)*9/5+32) +"°F");
+        } else {
+            lastTemp.setText((int)cities.temperature-273+"°C");
+        }
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date(cities.date*1000);
         lastDate.setText(sdf.format(date));

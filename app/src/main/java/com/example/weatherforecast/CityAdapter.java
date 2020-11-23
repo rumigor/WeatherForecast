@@ -42,7 +42,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
     @Override
     public void onBindViewHolder(@NonNull CityHolder holder, int position) {
         List<Story> citiesList = storySource.getStoryList();
-        Collections.reverse(citiesList);
+//        Collections.reverse(citiesList);
         Story story = citiesList.get(position);
         holder.bind(story, onCityClickListener, position, activity);
         // Тут определим, в каком пункте меню было нажато

@@ -25,7 +25,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
         String text = remoteMessage.getNotification().getBody();
         // создать нотификацию
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "3")
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "4")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)
                 .setContentText(text);

@@ -35,6 +35,14 @@ public class MainActivity extends AppCompatActivity
     private final static String CITY_NAME = "CityName";
     public static String cityName;
     private WirelessConnectionLost wirelessConnectionLost;
+    private SharedPreferences sharedPref;
+    // Имя ACTION для Broadcast, по нему Receiver и будет определяться
+    private static final String ACTION_SEND_MSG = "android.intent.action.BATTERY_LOW";
+    // Имя передаваемого параметра
+    private static final String NAME_MSG = "MSG";
+    // Эта константа спрятана в Intent классе,
+    // но именно при помощи ее можно поднять приложение
+    public static final int FLAG_RECEIVER_INCLUDE_BACKGROUND = 0x01000000;
 
 
     CurrentWeatherFragment currentWeatherFragment;
@@ -46,13 +54,14 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         wirelessConnectionLost = new WirelessConnectionLost();
         registerReceiver(wirelessConnectionLost, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
-
+        sharedPref = getPreferences(MODE_PRIVATE);
         initNotificationChannel();
-
+        initNotificationChannel2();
+        Metrics metrics = Metrics.getInstance();
+        metrics.setFahrenheit(sharedPref.getBoolean("METRICS", false));
         setContentView(R.layout.activity_main);
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
-        SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
         cityName = sharedPref.getString(CITY_NAME, null);
         initMain(savedInstanceState);
 
@@ -66,6 +75,15 @@ public class MainActivity extends AppCompatActivity
             notificationManager.createNotificationChannel(channel);
         }
 
+    }
+
+    private void initNotificationChannel2() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel("4", "push-messages", importance);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     @Override
@@ -160,7 +178,6 @@ public class MainActivity extends AppCompatActivity
                 cityName = query;
                 searchText.onActionViewCollapsed();
                 Toast.makeText(getApplicationContext(), cityName, Toast.LENGTH_LONG).show();
-                SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString(CITY_NAME, cityName).commit();
                 fragmentLoading();
@@ -254,6 +271,8 @@ public class MainActivity extends AppCompatActivity
             Metrics metrics = Metrics.getInstance();
             if (metrics.isFahrenheit()) {
                 metrics.setFahrenheit(false);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("METRICS", metrics.isFahrenheit()).commit();
                 fragmentLoading();
             }
         }
@@ -264,6 +283,8 @@ public class MainActivity extends AppCompatActivity
             metrics.setFahrenheit(false);
             if (!metrics.isFahrenheit()){
                 metrics.setFahrenheit(true);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("METRICS", metrics.isFahrenheit()).commit();
                 fragmentLoading();
             }
         }
