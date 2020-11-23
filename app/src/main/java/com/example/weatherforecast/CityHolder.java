@@ -1,6 +1,8 @@
 package com.example.weatherforecast;
 
 import android.app.Activity;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,7 +18,7 @@ public class CityHolder extends RecyclerView.ViewHolder {
     private final TextView cityName;
     private final TextView lastTemp;
     private final TextView lastDate;
-    private long menuPosition;
+
 
     public CityHolder(@NonNull View itemView) {
         super(itemView);
@@ -26,7 +28,7 @@ public class CityHolder extends RecyclerView.ViewHolder {
     }
 
 
-    void bind(final Story cities, final CityAdapter.OnCityClickListener onCityClickListener, final int position, Activity activity) {
+    void bind(final Story cities, final CityAdapter.OnCityClickListener onCityClickListener) {
         cityName.setText(cities.city);
         if (Metrics.getInstance().isFahrenheit()){
             lastTemp.setText((int)((cities.temperature-273)*9/5+32) +"°F");
@@ -45,12 +47,5 @@ public class CityHolder extends RecyclerView.ViewHolder {
                 }
             }
         });
-        cityName.setOnLongClickListener(view -> {
-            menuPosition = position;
-            return false;});
-
-        if (activity != null){
-            activity.registerForContextMenu(itemView);
-        }
     }
 }

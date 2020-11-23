@@ -19,15 +19,31 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
     private StorySource storySource;
     private long menuPosition;
 
+
     public CityAdapter(Activity activity, StorySource storySource) {
         this.activity = activity;
         this.storySource = storySource;
     }
 
+    onLongItemClickListener mOnLongItemClickListener;
+
+    public void setOnLongItemClickListener(onLongItemClickListener onLongItemClickListener) {
+        mOnLongItemClickListener = onLongItemClickListener;
+    }
+
+    public interface onLongItemClickListener {
+        void ItemLongClicked(View v, int position);
+    }
+
+    public void setMenuPosition(long menuPosition) {
+        this.menuPosition = menuPosition;
+    }
 
     public void setOnCityClickListener(OnCityClickListener onCityClickListener) {
         this.onCityClickListener = onCityClickListener;
     }
+
+
 
     @NonNull
     @Override
@@ -44,14 +60,18 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
         List<Story> citiesList = storySource.getStoryList();
 //        Collections.reverse(citiesList);
         Story story = citiesList.get(position);
-        holder.bind(story, onCityClickListener, position, activity);
-        // Тут определим, в каком пункте меню было нажато
-//        holder.itemView.setOnLongClickListener(view -> {
-//            menuPosition = position;
-//            return false;
-//        });
+        menuPosition = position;
+        holder.bind(story, onCityClickListener);
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (mOnLongItemClickListener != null) {
+                    mOnLongItemClickListener.ItemLongClicked(v, position);
+                }
 
-        // регистрируем контекстное меню
+                return true;
+            }
+        });
 
 
     }
@@ -68,6 +88,5 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
 
         void onClicked(String city);
     }
-
 
 }

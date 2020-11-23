@@ -34,8 +34,10 @@ public class SearchHistory extends Fragment {
     private CityAdapter cityAdapter;
     private StorySource storySource;
     private static final String NIGHT_THEME = "darkTheme";
+    private RecyclerView recyclerView;
+    private int mCurrentItemPosition;
 
-    CurrentWeatherFragment currentWeatherFragment;
+    private CurrentWeatherFragment currentWeatherFragment;
 
     public SearchHistory() {}
 
@@ -55,10 +57,19 @@ public class SearchHistory extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initRecyclerView(view);
+        registerForContextMenu(recyclerView);
         cityAdapter.setOnCityClickListener(this::weatherFrameLoading);
+        cityAdapter.setOnLongItemClickListener(new CityAdapter.onLongItemClickListener() {
+            @Override
+            public void ItemLongClicked(View v, int position) {
+                mCurrentItemPosition = position;
+                v.showContextMenu();
+            }
+        });
+
     }
     private void initRecyclerView(View view){
-        final RecyclerView recyclerView = view.findViewById(R.id.cityRecycler);
+        recyclerView = view.findViewById(R.id.cityRecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
         StoryDao storyDao = App
                 .getInstance()
