@@ -232,19 +232,7 @@ public class CurrentWeatherFragment extends Fragment {
             forecasts.add(forecast);
         }
         weatherAdapter.setDays(forecasts);
-        ArrayList<String> firstcities = new ArrayList<>((Arrays.asList(getString(R.string.spb), getString(R.string.vln), getString(R.string.bcn), getString(R.string.msc), getString(R.string.bru))));
-        Cities cities = Cities.getInstance(firstcities);
-        boolean notInList = true;
-        if (cityName != null) {
-            for (int i = 0; i < cities.getCitiesList().size(); i++) {
-                if (cities.getCitiesList().get(i).equals(cityName)) {
-                    notInList = false;
-                }
-            }
-            if (notInList) {
-                cities.getCitiesList().add(0, cityName);
-            }
-        }
+
     }
 
     private void initNotificationChannel() {

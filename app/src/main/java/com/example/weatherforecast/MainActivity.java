@@ -1,8 +1,14 @@
 package com.example.weatherforecast;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +34,7 @@ public class MainActivity extends AppCompatActivity
 
     private final static String CITY_NAME = "CityName";
     public static String cityName;
+    private WirelessConnectionLost wirelessConnectionLost;
 
 
     CurrentWeatherFragment currentWeatherFragment;
@@ -37,6 +44,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        wirelessConnectionLost = new WirelessConnectionLost();
+        registerReceiver(wirelessConnectionLost, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
+
+        initNotificationChannel();
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
@@ -44,6 +56,22 @@ public class MainActivity extends AppCompatActivity
         cityName = sharedPref.getString(CITY_NAME, null);
         initMain(savedInstanceState);
 
+    }
+
+    private void initNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel("3", "name", importance);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(wirelessConnectionLost);
     }
 
     private Toolbar initToolbar() {

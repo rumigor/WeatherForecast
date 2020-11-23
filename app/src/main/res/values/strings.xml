@@ -49,4 +49,8 @@
     <string name="button">OK</string>
     <string name="dialog_message">Choose metrics</string>
     <string name="ok">°C</string>
+    <string name="update">Update</string>
+    <string name="remove">Remove</string>
+    <string name="wifiLost">Wireless connection is lost!</string>
+    <string name="wififound">Wi-Fi is enabled!</string>
 </resources>

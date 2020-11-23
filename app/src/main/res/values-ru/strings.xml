@@ -49,4 +49,8 @@
     <string name="button">OK</string>
     <string name="dialog_message">Выберите градусы</string>
     <string name="ok">°C</string>
+    <string name="update">Обновить</string>
+    <string name="remove">Удалить</string>
+    <string name="wifiLost">Беспроводное соединение потеряно!</string>
+    <string name="wififound">Беспроводное соединение подключено!</string>
 </resources>

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "874473957318",
+    "firebase_url": "https://weatherforecast-45639.firebaseio.com",
+    "project_id": "weatherforecast-45639",
+    "storage_bucket": "weatherforecast-45639.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:874473957318:android:47b6d5947c72a0afe634c7",
+        "android_client_info": {
+          "package_name": "com.example.weatherforecast"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "874473957318-v22utm3jae4h5fj0l0hrifjkh7cl5r0i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuZ4y23jpKLp8w7dOIzUw0qOYaGIoTDPs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "874473957318-v22utm3jae4h5fj0l0hrifjkh7cl5r0i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

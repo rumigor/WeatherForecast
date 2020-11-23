@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
-    private List<CitiesList> cities;
     private OnCityClickListener onCityClickListener;
     private Activity activity;
     private StorySource storySource;
@@ -25,10 +24,6 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
         this.storySource = storySource;
     }
 
-    public void setCities(List<CitiesList> cities) {
-        this.cities = cities;
-        notifyDataSetChanged();
-    }
 
     public void setOnCityClickListener(OnCityClickListener onCityClickListener) {
         this.onCityClickListener = onCityClickListener;
@@ -49,18 +44,30 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
         List<Story> citiesList = storySource.getStoryList();
         Collections.reverse(citiesList);
         Story story = citiesList.get(position);
-        holder.bind(story, onCityClickListener);
+        holder.bind(story, onCityClickListener, position, activity);
+        // Тут определим, в каком пункте меню было нажато
+//        holder.itemView.setOnLongClickListener(view -> {
+//            menuPosition = position;
+//            return false;
+//        });
+
+        // регистрируем контекстное меню
+
 
     }
 
     @Override
     public int getItemCount() {
-        if (cities == null) return 0;
-
         return (int)storySource.getCountStoryList();
     }
+    public long getMenuPosition() {
+        return menuPosition;
+    }
+
     interface OnCityClickListener {
 
         void onClicked(String city);
     }
+
+
 }
