@@ -80,7 +80,7 @@ public class SearchHistory extends Fragment {
     }
     private void initRecyclerView(View view){
         recyclerView = view.findViewById(R.id.cityRecycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, true));
         StoryDao storyDao = App
                 .getInstance()
                 .getStoryDao();
@@ -112,6 +112,9 @@ public class SearchHistory extends Fragment {
                         .get((int) cityAdapter.getMenuPosition());
                 storySource.removeStory(storyForRemove.id);
                 cityAdapter.notifyItemRemoved((int) cityAdapter.getMenuPosition());
+                cityAdapter.setCities(storySource.getStoryList());
+                cityAdapter.setCitiesNumber(storySource.getCountStoryList());
+                recyclerView.setAdapter(cityAdapter);
                 return true;
         }
         return super.onContextItemSelected(item);

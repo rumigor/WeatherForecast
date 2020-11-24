@@ -31,6 +31,10 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
         mOnLongItemClickListener = onLongItemClickListener;
     }
 
+    public void setCitiesNumber(long citiesNumber) {
+        this.citiesNumber = citiesNumber;
+    }
+
     public interface onLongItemClickListener {
         void ItemLongClicked(View v, int position);
     }
@@ -40,7 +44,9 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
         this.onCityClickListener = onCityClickListener;
     }
 
-
+    public void setCities(List<Story> cities) {
+        this.cities = cities;
+    }
 
     @NonNull
     @Override

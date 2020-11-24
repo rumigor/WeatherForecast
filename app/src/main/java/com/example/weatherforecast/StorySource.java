@@ -24,7 +24,6 @@ public class StorySource {
 
     public void LoadStoryList(){
         storyList = storyDao.getAllStories();
-        Collections.reverse(storyList);
     }
 
 
