@@ -3,6 +3,7 @@ package com.example.weatherforecast;
 import com.example.weatherforecast.roomDataBase.Story;
 import com.example.weatherforecast.roomDataBase.StoryDao;
 
+import java.util.Collections;
 import java.util.List;
 
 public class StorySource {
@@ -23,6 +24,7 @@ public class StorySource {
 
     public void LoadStoryList(){
         storyList = storyDao.getAllStories();
+        Collections.reverse(storyList);
     }
 
 
@@ -43,6 +45,11 @@ public class StorySource {
     public void removeStory(long id){
         storyDao.deteleStoryById(id);
         LoadStoryList();
+    }
+
+    public List<Story> filterStoryByCityName(String city){
+        storyList = storyDao.getStoryByCity(city);
+        return storyList;
     }
 
 }

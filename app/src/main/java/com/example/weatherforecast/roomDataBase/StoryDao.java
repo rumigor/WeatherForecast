@@ -29,6 +29,9 @@ public interface StoryDao {
     @Query("SELECT * FROM story WHERE id = :id")
     Story getStoryById(long id);
 
+    @Query("SELECT * FROM story WHERE city = :city")
+    List<Story> getStoryByCity(String city);
+
     @Query("SELECT COUNT() FROM story")
     long getCountStories();
 }

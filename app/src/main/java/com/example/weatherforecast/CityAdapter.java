@@ -15,19 +15,32 @@ import java.util.List;
 
 public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
     private OnCityClickListener onCityClickListener;
-    private Activity activity;
-    private StorySource storySource;
+    private List<Story> cities;
     private long menuPosition;
+    private long citiesNumber;
 
-    public CityAdapter(Activity activity, StorySource storySource) {
-        this.activity = activity;
-        this.storySource = storySource;
+
+    public CityAdapter(List<Story> cities, long citiesNumber) {
+        this.cities = cities;
+        this.citiesNumber = citiesNumber;
+    }
+
+    onLongItemClickListener mOnLongItemClickListener;
+
+    public void setOnLongItemClickListener(onLongItemClickListener onLongItemClickListener) {
+        mOnLongItemClickListener = onLongItemClickListener;
+    }
+
+    public interface onLongItemClickListener {
+        void ItemLongClicked(View v, int position);
     }
 
 
     public void setOnCityClickListener(OnCityClickListener onCityClickListener) {
         this.onCityClickListener = onCityClickListener;
     }
+
+
 
     @NonNull
     @Override
@@ -41,24 +54,26 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull CityHolder holder, int position) {
-        List<Story> citiesList = storySource.getStoryList();
-//        Collections.reverse(citiesList);
-        Story story = citiesList.get(position);
-        holder.bind(story, onCityClickListener, position, activity);
-        // Тут определим, в каком пункте меню было нажато
-//        holder.itemView.setOnLongClickListener(view -> {
-//            menuPosition = position;
-//            return false;
-//        });
+        Story story = cities.get(position);
+        menuPosition = position;
+        holder.bind(story, onCityClickListener);
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (mOnLongItemClickListener != null) {
+                    mOnLongItemClickListener.ItemLongClicked(v, position);
+                }
 
-        // регистрируем контекстное меню
+                return true;
+            }
+        });
 
 
     }
 
     @Override
     public int getItemCount() {
-        return (int)storySource.getCountStoryList();
+        return (int)citiesNumber;
     }
     public long getMenuPosition() {
         return menuPosition;
@@ -68,6 +83,5 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
 
         void onClicked(String city);
     }
-
 
 }

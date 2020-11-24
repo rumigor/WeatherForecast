@@ -53,4 +53,5 @@
     <string name="remove">Удалить</string>
     <string name="wifiLost">Беспроводное соединение потеряно!</string>
     <string name="wififound">Беспроводное соединение подключено!</string>
+    <string name="filter_by_city">Фильтр по городу</string>
 </resources>

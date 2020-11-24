@@ -17,6 +17,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.weatherforecast.roomDataBase.App;
 import com.example.weatherforecast.roomDataBase.Story;
@@ -33,9 +35,14 @@ public class SearchHistory extends Fragment {
     private String cityName;
     private CityAdapter cityAdapter;
     private StorySource storySource;
+    private List<Story> cities;
     private static final String NIGHT_THEME = "darkTheme";
+    private RecyclerView recyclerView;
+    private int mCurrentItemPosition;
+    private TextView cityFilter;
+    private Button filter;
 
-    CurrentWeatherFragment currentWeatherFragment;
+    private CurrentWeatherFragment currentWeatherFragment;
 
     public SearchHistory() {}
 
@@ -55,16 +62,31 @@ public class SearchHistory extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initRecyclerView(view);
-        cityAdapter.setOnCityClickListener(this::weatherFrameLoading);
+        registerForContextMenu(recyclerView);
+        clicks();
+        cityFilter = view.findViewById(R.id.cityFilter);
+        filter = view.findViewById(R.id.filter);
+        filter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cities = storySource.filterStoryByCityName(cityFilter.getText().toString());
+                cityAdapter = new CityAdapter(cities, cities.size());
+                recyclerView.setAdapter(cityAdapter);
+                registerForContextMenu(recyclerView);
+                clicks();
+            }
+        });
+
     }
     private void initRecyclerView(View view){
-        final RecyclerView recyclerView = view.findViewById(R.id.cityRecycler);
+        recyclerView = view.findViewById(R.id.cityRecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
         StoryDao storyDao = App
                 .getInstance()
                 .getStoryDao();
         storySource = new StorySource(storyDao);
-        cityAdapter = new CityAdapter(requireActivity(), storySource);
+        cities = storySource.getStoryList();
+        cityAdapter = new CityAdapter(cities, storySource.getCountStoryList());
         recyclerView.setAdapter(cityAdapter);
     }
     @Override
@@ -79,14 +101,12 @@ public class SearchHistory extends Fragment {
         int id = item.getItemId();
         switch (id) {
             case R.id.update_context:
-                // Изменение имени и фамилии у студента
                 Story story = storySource
                         .getStoryList()
                         .get((int) cityAdapter.getMenuPosition());
                 weatherFrameLoading(story.city);
                 return true;
             case R.id.remove_context:
-                // Удалить запись из базы
                 Story storyForRemove = storySource
                         .getStoryList()
                         .get((int) cityAdapter.getMenuPosition());
@@ -107,5 +127,16 @@ public class SearchHistory extends Fragment {
                 .beginTransaction()
                 .replace(R.id.mainFragment, currentWeatherFragment)
                 .commit();
+    }
+
+    private void clicks(){
+        cityAdapter.setOnCityClickListener(SearchHistory.this::weatherFrameLoading);
+        cityAdapter.setOnLongItemClickListener(new CityAdapter.onLongItemClickListener() {
+            @Override
+            public void ItemLongClicked(View v, int position) {
+                mCurrentItemPosition = position;
+                v.showContextMenu();
+            }
+        });
     }
 }

@@ -12,6 +12,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <EditText
+            android:id="@+id/cityFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:hint="@string/choose_city"
+            app:layout_constraintBottom_toTopOf="@+id/cityRecycler"
+            app:layout_constraintEnd_toStartOf="@+id/changeCityTitle"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/changeCityTitle"
+            app:layout_constraintVertical_bias="0.0" />
+
         <TextView
             android:id="@+id/changeCityTitle"
             android:layout_width="wrap_content"
@@ -20,6 +34,7 @@
             android:textColor="#FFEBEE"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.416"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -29,9 +44,10 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textLayout"
-            app:layout_constraintVertical_bias="0.357" />
+            app:layout_constraintTop_toBottomOf="@+id/filter"
+            app:layout_constraintVertical_bias="0.49" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textLayout"
@@ -41,6 +57,17 @@
             app:errorEnabled="true"
             app:helperTextTextColor="#EDE7F6"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/changeCityTitle" />
+
+        <Button
+            android:id="@+id/filter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_by_city"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/cityFilter"
             app:layout_constraintTop_toBottomOf="@+id/changeCityTitle" />
 
 
