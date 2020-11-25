@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.weatherforecast.forecast.ForecastRequest;
 import com.example.weatherforecast.model.WeatherRequest;
 import com.example.weatherforecast.roomDataBase.App;
+import com.example.weatherforecast.roomDataBase.Story;
 import com.example.weatherforecast.roomDataBase.StoryDao;
 import com.squareup.picasso.Picasso;
 
@@ -39,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -186,11 +188,6 @@ public class CurrentWeatherFragment extends Fragment {
             thermometer.changeUnit(true);
             thermometer.setCurrentTemp(weatherRequest.getMain().getTemp() - 273);
             temperature.setText(String.format("%d%s", (int) weatherRequest.getMain().getTemp() - 273, "°C"));
-            StoryDao storyDao = App
-                    .getInstance()
-                    .getStoryDao();
-            storySource = new StorySource(storyDao);
-            storySource.addStory(new GetStoryData(weatherRequest).UpdateStory());
         }
         else {
             thermometer.changeUnit(false);
@@ -207,6 +204,17 @@ public class CurrentWeatherFragment extends Fragment {
         Picasso.get().load(imageURL)
                 .error(R.drawable.cloudy)
                 .into(currentWeather);
+        StoryDao storyDao = App
+                .getInstance()
+                .getStoryDao();
+        storySource = new StorySource(storyDao);
+        List<Story> cities = storySource.getStoryList();
+        for (int i = 0; i < cities.size(); i++) {
+            if (cities.get(i).city.equals(weatherRequest.getName()) && cities.get(i).date == weatherRequest.getDt()){
+                return;
+            }
+        }
+        storySource.addStory(new GetStoryData(weatherRequest).UpdateStory());
     }
 
     private void displayForecast(ForecastRequest forecastRequest1) { //отображаем прогноз, в зависимости от настроек (°С или °F)

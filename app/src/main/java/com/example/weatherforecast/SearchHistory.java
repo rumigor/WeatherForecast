@@ -36,7 +36,6 @@ public class SearchHistory extends Fragment {
     private CityAdapter cityAdapter;
     private StorySource storySource;
     private List<Story> cities;
-    private static final String NIGHT_THEME = "darkTheme";
     private RecyclerView recyclerView;
     private int mCurrentItemPosition;
     private TextView cityFilter;
@@ -66,27 +65,27 @@ public class SearchHistory extends Fragment {
         clicks();
         cityFilter = view.findViewById(R.id.cityFilter);
         filter = view.findViewById(R.id.filter);
-        filter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cities = storySource.filterStoryByCityName(cityFilter.getText().toString());
-                cityAdapter = new CityAdapter(cities, cities.size());
-                recyclerView.setAdapter(cityAdapter);
-                registerForContextMenu(recyclerView);
-                clicks();
-            }
+        filter.setOnClickListener(v -> {
+            cities = storySource.filterStoryByCityName(cityFilter.getText().toString());
+            cityAdapter = new CityAdapter(storySource);
+            recyclerView.setAdapter(cityAdapter);
+            registerForContextMenu(recyclerView);
+            clicks();
         });
 
     }
     private void initRecyclerView(View view){
         recyclerView = view.findViewById(R.id.cityRecycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, true));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireActivity());
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
         StoryDao storyDao = App
                 .getInstance()
                 .getStoryDao();
         storySource = new StorySource(storyDao);
         cities = storySource.getStoryList();
-        cityAdapter = new CityAdapter(cities, storySource.getCountStoryList());
+        cityAdapter = new CityAdapter(storySource);
         recyclerView.setAdapter(cityAdapter);
     }
     @Override
@@ -103,19 +102,22 @@ public class SearchHistory extends Fragment {
             case R.id.update_context:
                 Story story = storySource
                         .getStoryList()
-                        .get((int) cityAdapter.getMenuPosition());
+                        .get(mCurrentItemPosition);
                 weatherFrameLoading(story.city);
                 return true;
             case R.id.remove_context:
                 Story storyForRemove = storySource
                         .getStoryList()
-                        .get((int) cityAdapter.getMenuPosition());
+                        .get(mCurrentItemPosition);
                 storySource.removeStory(storyForRemove.id);
-                cityAdapter.notifyItemRemoved((int) cityAdapter.getMenuPosition());
-                cityAdapter.setCities(storySource.getStoryList());
-                cityAdapter.setCitiesNumber(storySource.getCountStoryList());
-                recyclerView.setAdapter(cityAdapter);
+                cityAdapter.notifyItemRemoved(mCurrentItemPosition);
+                cityAdapter.notifyDataSetChanged();
                 return true;
+            case R.id.clear_context:
+                for (int i = 0; i < cities.size(); i++) {
+                    storySource.removeStory(cities.get(i).id);
+                }
+                cityAdapter.notifyDataSetChanged();
         }
         return super.onContextItemSelected(item);
     }
@@ -134,12 +136,9 @@ public class SearchHistory extends Fragment {
 
     private void clicks(){
         cityAdapter.setOnCityClickListener(SearchHistory.this::weatherFrameLoading);
-        cityAdapter.setOnLongItemClickListener(new CityAdapter.onLongItemClickListener() {
-            @Override
-            public void ItemLongClicked(View v, int position) {
-                mCurrentItemPosition = position;
-                v.showContextMenu();
-            }
+        cityAdapter.setOnLongItemClickListener((v, position) -> {
+            mCurrentItemPosition = position;
+            v.showContextMenu();
         });
     }
 }

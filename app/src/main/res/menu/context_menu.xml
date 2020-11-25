@@ -3,5 +3,6 @@
 
     <item android:title="@string/update" android:id="@+id/update_context"/>
     <item android:title="@string/remove" android:id="@+id/remove_context"/>
+    <item android:title="@string/delete_all" android:id="@+id/clear_context"/>
 
 </menu>
