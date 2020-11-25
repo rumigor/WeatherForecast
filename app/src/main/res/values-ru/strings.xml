@@ -55,4 +55,6 @@
     <string name="wififound">Беспроводное соединение подключено!</string>
     <string name="filter_by_city">Фильтр по городу</string>
     <string name="delete_all">Очистить список</string>
+    <string name="latitude">Широта</string>
+    <string name="longitude">Долгота</string>
 </resources>

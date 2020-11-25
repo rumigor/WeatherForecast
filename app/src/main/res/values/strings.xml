@@ -55,4 +55,6 @@
     <string name="wififound">Wi-Fi is enabled!</string>
     <string name="filter_by_city">Filter by City</string>
     <string name="delete_all">Delete all</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
 </resources>
