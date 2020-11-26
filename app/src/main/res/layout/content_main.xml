@@ -36,28 +36,12 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.64" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/openInternet"
-        style="@style/MyButtonStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#8BC34A"
-        android:insetLeft="2dp"
-        android:insetTop="2dp"
-        android:insetRight="2dp"
-        android:insetBottom="2dp"
-        android:text="@string/more_on_gismeteo"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
-
 
     <FrameLayout
         android:id="@+id/mainFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline3"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">

@@ -66,6 +66,7 @@ public class CurrentWeatherFragment extends Fragment {
     private EditText windSpeed;
     private ImageView currentWeather;
     private Thermometer thermometer;
+    private EditText weatherCondition;
     private Metrics metrics;
     private StorySource storySource;
 
@@ -138,6 +139,7 @@ public class CurrentWeatherFragment extends Fragment {
         humidity =view.findViewById(R.id.textHumidity);
         windSpeed = view.findViewById(R.id.textWindspeed);
         currentWeather = view.findViewById(R.id.weatherIco);
+        weatherCondition = view.findViewById(R.id.textWeatherCondition);
         dataLoading(cityName, lat, lon);
     }
 
@@ -208,6 +210,7 @@ public class CurrentWeatherFragment extends Fragment {
         pressure.setText(String.format("%.1f %s", weatherRequest.getMain().getPressure() / 1.33f, getString(R.string.pressureValue)));
         humidity.setText(String.format("%d%s", weatherRequest.getMain().getHumidity(), "%"));
         windSpeed.setText(String.format("%.1f %s", weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue)));
+        weatherCondition.setText(weatherRequest.getWeather()[0].getDescription());
         String imageURL = String.format("https://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon());
         Picasso.get().load(imageURL)
                 .error(R.drawable.cloudy)
@@ -238,8 +241,8 @@ public class CurrentWeatherFragment extends Fragment {
                 nightTemp = String.format("%.1f%s", forecastRequest1.getDaily()[i].getTemp().getNight() - 273.15f, "°C");
             }
             else {
-                float dTemp = forecastRequest1.getDaily()[i].getTemp().getDay()-273.15f*1.8f+32;
-                float nTemp = forecastRequest1.getDaily()[i].getTemp().getNight()-273.15f*1.8f+32;
+                float dTemp = (forecastRequest1.getDaily()[i].getTemp().getDay()-273.15f)*1.8f+32;
+                float nTemp = (forecastRequest1.getDaily()[i].getTemp().getNight()-273.15f)*1.8f+32;
                 dayTemp = String.format("%.1f%s", dTemp, "°F");
                 nightTemp = String.format("%.1f%s", nTemp, "°F");
             }

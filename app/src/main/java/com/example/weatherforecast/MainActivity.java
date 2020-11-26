@@ -126,29 +126,7 @@ public class MainActivity extends AppCompatActivity
 
 
     private void initMain(Bundle savedInstanceState) {
-        fragmentLoading();
-
-        Button goToWeb = findViewById(R.id.openInternet);
-        goToWeb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                String url="";
-//                if (city.equals(getString(R.string.spb))){
-//                    url = "https://www.gismeteo.ru/weather-sankt-peterburg-4079/";
-//                }
-//                else if (city.equals(getString(R.string.vln))){
-//                    url = "https://www.gismeteo.ru/weather-vilnius-4230/";
-//                }
-//                else if (city.equals(getString(R.string.bcn))){
-//                    url = "https://www.gismeteo.ru/weather-barcelona-1948/";
-//                }
-//                else url = "https://www.gismeteo.ru/";
-//                Uri uri = Uri.parse(url);
-//                Intent browser = new Intent(Intent.ACTION_VIEW, uri);
-//                startActivity(browser);
-                    loadMap();
-            }
-        });
+        fragmentLoading(cityName, lat, lng);
     }
 
     @Override
@@ -176,7 +154,7 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(getApplicationContext(), cityName, Toast.LENGTH_LONG).show();
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString(CITY_NAME, cityName).commit();
-                fragmentLoading();
+                fragmentLoading(cityName, 0, 0);
                 return true;
             }
             // реагирует на нажатие каждой клавиши
@@ -189,8 +167,7 @@ public class MainActivity extends AppCompatActivity
         refresh.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if (cityName == null) {cityName = "Saint Petersburg,RU";}
-                fragmentLoading();
+                fragmentLoading(cityName, lat, lng);
                 return true;
             }
         });
@@ -219,7 +196,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            fragmentLoading();
+            fragmentLoading(cityName, 0, 0);
 
         } else if (id == R.id.nav_history) {
             SearchHistory searchHistory = new SearchHistory();
@@ -252,14 +229,14 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK){
             cityName = data.getExtras().getString(CITY_NAME);
-            fragmentLoading();
+            fragmentLoading(cityName, lat, lng);
         }
         if (resultCode == 100){
             recreate();
 
         }
     }
-    private void fragmentLoading(){
+    private void fragmentLoading(String cityName, float lat, float lng){
 
         currentWeatherFragment = CurrentWeatherFragment.create(cityName, lat, lng);
         getSupportFragmentManager()
@@ -278,7 +255,7 @@ public class MainActivity extends AppCompatActivity
                 metrics.setFahrenheit(false);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("METRICS", metrics.isFahrenheit()).commit();
-                fragmentLoading();
+                fragmentLoading(cityName, 0, 0);
             }
         }
 
@@ -290,7 +267,7 @@ public class MainActivity extends AppCompatActivity
                 metrics.setFahrenheit(true);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("METRICS", metrics.isFahrenheit()).commit();
-                fragmentLoading();
+                fragmentLoading(cityName,0,0);
             }
         }
     };
@@ -332,8 +309,6 @@ public class MainActivity extends AppCompatActivity
     }
     // Запрашиваем координаты
     private void requestLocation() {
-        // Если Permission’а всё- таки нет, просто выходим: приложение не имеет
-        // смысла
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             return;
@@ -341,13 +316,6 @@ public class MainActivity extends AppCompatActivity
         LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-
-        // Получаем наиболее подходящий провайдер геолокации по критериям.
-        // Но определить, какой провайдер использовать, можно и самостоятельно.
-        // В основном используются LocationManager.GPS_PROVIDER или
-        // LocationManager.NETWORK_PROVIDER, но можно использовать и
-        // LocationManager.PASSIVE_PROVIDER - для получения координат в
-        // пассивном режиме
         String provider = locationManager.getBestProvider(criteria, true);
         if (provider != null) {
             // Будем получать геоположение через каждые 10 минут или каждые

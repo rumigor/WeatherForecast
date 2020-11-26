@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,14 +45,18 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
     private TextView textAddress;
     private Marker currentMarker;
     private GoogleMap mMap;
+    private float lat;
+    private float lon;
 
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng sydney = new LatLng(-34, 151);
-        currentMarker = mMap.addMarker(new MarkerOptions().position(sydney).title("Текущая позиция"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng latLng = new LatLng(-34, 151);
+        lat = (float)latLng.latitude;
+        lon = (float)latLng.longitude;
+        currentMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Текущая позиция"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
@@ -111,6 +116,18 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
         textLongitude = view.findViewById(R.id.editLng);
         textAddress = view.findViewById(R.id.textAddress);
         initSearchByAddress(view);
+        Button viewWeather = view.findViewById(R.id.viewWeather);
+        viewWeather.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CurrentWeatherFragment currentWeatherFragment = CurrentWeatherFragment.create(null, lat, lon);
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.mainFragment, currentWeatherFragment)
+                        .addToBackStack("WEATHER_FRAGMENT")
+                        .commit();
+            }
+        });
     }
     private void requestPemissions() {
         // Проверим, есть ли Permission’ы, и если их нет, запрашиваем их у
@@ -149,17 +166,18 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
             locationManager.requestLocationUpdates(provider, 10000, 10, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-                    double lat = location.getLatitude(); // Широта
-                    String latitude = Double.toString(lat);
+                    double latd = location.getLatitude(); // Широта
+                    String latitude = Double.toString(latd);
                     textLatitude.setText(latitude);
 
                     double lng = location.getLongitude(); // Долгота
                     String longitude = Double.toString(lng);
                     textLongitude.setText(longitude);
-
+                    lat = (float) latd;
+                    lon = (float) lng;
                     String accuracy = Float.toString(location.getAccuracy());   // Точность
 
-                    LatLng currentPosition = new LatLng(lat, lng);
+                    LatLng currentPosition = new LatLng(latd, lng);
                     currentMarker.setPosition(currentPosition);
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, (float)12));
                 }
@@ -228,6 +246,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
                                     @Override
                                     public void run() {
                                         currentMarker.setPosition(location);
+                                        lat = (float)location.latitude;
+                                        lon = (float)location.longitude;
                                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, (float)15));
                                     }
                                 });

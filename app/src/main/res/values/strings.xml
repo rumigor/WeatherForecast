@@ -58,4 +58,6 @@
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="open_map">Open map</string>
+    <string name="view_weather">View Weather</string>
+    <string name="weather_condition">Weather Condition</string>
 </resources>

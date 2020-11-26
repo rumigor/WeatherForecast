@@ -58,4 +58,6 @@
     <string name="latitude">Широта</string>
     <string name="longitude">Долгота</string>
     <string name="open_map">Открыть карту</string>
+    <string name="view_weather">Показать погоду</string>
+    <string name="weather_condition">Состояние погоды</string>
 </resources>
