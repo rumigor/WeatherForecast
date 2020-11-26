@@ -20,10 +20,15 @@ public class GetDataService extends IntentService {
     private static final String ACTION_LOAD_DATA = "LOAD_DATA";
     static final String CURRENT_WEATHER = "CURRENT_WEATHER";
     static final String FORECAST_DATA = "FORECAST_DATA";
+    private static final String LATITUDE = "LATITUDE";
+    private static final String LONGITUDE = "LONGITUDE";
     private CurrentWeatherRetrofit currentWeatherRetrofit;
     private ForecastRetrofit forecastRetrofit;
+    private WeatherRetrofitByCoords weatherRetrofitByCoords;
     private WeatherRequest weatherRequest;
     private ForecastRequest forecastRequest;
+    private float lat;
+    private float lon;
 
 
     private static final String CITY_NAME = "CITY_NAME";
@@ -35,10 +40,12 @@ public class GetDataService extends IntentService {
     }
 
 
-    public static void startGetDataService(Context context, String cityName) {
+    public static void startGetDataService(Context context, String cityName, float lat, float lon) {
         Intent intent = new Intent(context, GetDataService.class);
         intent.setAction(ACTION_LOAD_DATA);
         intent.putExtra(CITY_NAME, cityName);
+        intent.putExtra(LATITUDE, lat);
+        intent.putExtra(LONGITUDE, lon);
         context.startService(intent);
     }
 
@@ -50,15 +57,17 @@ public class GetDataService extends IntentService {
             final String action = intent.getAction();
             if (ACTION_LOAD_DATA.equals(action)) {
                 final String city = intent.getStringExtra(CITY_NAME);
-                handleActionLoadData(city);
+                lat = intent.getFloatExtra(LATITUDE, lat);
+                lon = intent.getFloatExtra(LONGITUDE, lon);
+                handleActionLoadData(city, lat, lon);
             }
         }
     }
 
 
-    private void handleActionLoadData(String city) {
+    private void handleActionLoadData(String city, float lat, float lon) {
         initRetorfit();
-        requestCurrentWeatherRetrofit(city, BuildConfig.WEATHER_API_KEY);
+        requestCurrentWeatherRetrofit(city, lat, lon, BuildConfig.WEATHER_API_KEY);
     }
 
     private void makeNote(String message){
@@ -83,27 +92,48 @@ public class GetDataService extends IntentService {
                 .build();
         currentWeatherRetrofit = retrofit.create(CurrentWeatherRetrofit.class);
         forecastRetrofit = retrofit.create(ForecastRetrofit.class);
+        weatherRetrofitByCoords = retrofit.create(WeatherRetrofitByCoords.class);
     }
 
 
-    private void requestCurrentWeatherRetrofit(String city, String keyApi){
-        currentWeatherRetrofit.loadWeather(city, keyApi)
-                .enqueue(new Callback<WeatherRequest>() {
-                    @Override
-                    public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
-                        if (response.body() != null) {
-                            weatherRequest = response.body();
-                            String exclude = "current,minutely,hourly,alerts";
-                            requestForecastRetrofit(weatherRequest.getCoord().getLat(), weatherRequest.getCoord().getLon(), exclude);
+    private void requestCurrentWeatherRetrofit(String city, float lat, float lon, String keyApi){
+        if (lat == 0 || lon ==0) {
+            currentWeatherRetrofit.loadWeather(city, keyApi)
+                    .enqueue(new Callback<WeatherRequest>() {
+                        @Override
+                        public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
+                            if (response.body() != null) {
+                                weatherRequest = response.body();
+                                String exclude = "current,minutely,hourly,alerts";
+                                requestForecastRetrofit(weatherRequest.getCoord().getLat(), weatherRequest.getCoord().getLon(), exclude);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<WeatherRequest> call, Throwable t) {
-                        makeNote(getString(R.string.cityNotFound));
-                        sendBrodcast(null, null);
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<WeatherRequest> call, Throwable t) {
+                            makeNote(getString(R.string.cityNotFound));
+                            sendBrodcast(null, null);
+                        }
+                    });
+        } else {
+            weatherRetrofitByCoords.loadWeather(lat, lon, keyApi)
+                    .enqueue(new Callback<WeatherRequest>() {
+                        @Override
+                        public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
+                            if (response.body() != null) {
+                                weatherRequest = response.body();
+                                String exclude = "current,minutely,hourly,alerts";
+                                requestForecastRetrofit(weatherRequest.getCoord().getLat(), weatherRequest.getCoord().getLon(), exclude);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<WeatherRequest> call, Throwable t) {
+                            makeNote(getString(R.string.cityNotFound));
+                            sendBrodcast(null, null);
+                        }
+                    });
+        }
     }
 
     private void requestForecastRetrofit(float lat, float lon, String exclude){

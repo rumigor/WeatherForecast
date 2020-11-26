@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import static android.content.Context.LOCATION_SERVICE;
@@ -57,8 +58,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
                 getAddress(latLng);
                 currentMarker.setPosition(latLng);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                textLatitude.setText(String.valueOf(latLng.latitude));
-                textLongitude.setText(String.valueOf(latLng.longitude));
+                textLatitude.setText(new DecimalFormat("#0.000000").format(latLng.latitude));
+                textLongitude.setText(new DecimalFormat("#0.000000").format(latLng.longitude));
             }
         });
     }

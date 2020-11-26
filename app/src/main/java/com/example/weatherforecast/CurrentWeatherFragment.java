@@ -50,10 +50,14 @@ import static android.content.Context.MODE_PRIVATE;
 public class CurrentWeatherFragment extends Fragment {
 
     private static final String CITY_NAME ="CityName";
+    private static final String LATITUDE = "LATITUDE";
+    private static final String LONGITUDE = "LONGITUDE";
+    private SharedPreferences sharedPref;
     private String cityName;
     final WeatherAdapter weatherAdapter = new WeatherAdapter();
     static final String BROADCAST_GET_DATA = "GET_DATA";
-
+    private float lat;
+    private float lon;
 
     private EditText city;
     private EditText temperature;
@@ -68,10 +72,12 @@ public class CurrentWeatherFragment extends Fragment {
 
 
 
-    public static CurrentWeatherFragment create(String cityName) {
+    public static CurrentWeatherFragment create(String cityName, float lat, float lon) {
         CurrentWeatherFragment fragment = new CurrentWeatherFragment();
         Bundle args = new Bundle();
         args.putString(CITY_NAME, cityName);
+        args.putFloat(LATITUDE, lat);
+        args.putFloat(LONGITUDE, lon);
         fragment.setArguments(args);
         return fragment;
     }
@@ -93,6 +99,8 @@ public class CurrentWeatherFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             cityName = getArguments().getString(CITY_NAME);
+            lat = getArguments().getFloat(LATITUDE);
+            lon = getArguments().getFloat(LONGITUDE);
         }
         else {
             SharedPreferences sharedPref = requireActivity().getPreferences(MODE_PRIVATE);
@@ -130,15 +138,12 @@ public class CurrentWeatherFragment extends Fragment {
         humidity =view.findViewById(R.id.textHumidity);
         windSpeed = view.findViewById(R.id.textWindspeed);
         currentWeather = view.findViewById(R.id.weatherIco);
-        dataLoading(cityName);
+        dataLoading(cityName, lat, lon);
     }
 
     //Загружаем информацию
-    private void dataLoading(String cityName){
-        if (cityName == null){
-            cityName = "Saint Petersburg";
-        }
-        GetDataService.startGetDataService(getContext(), cityName);
+    private void dataLoading(String cityName, float lat, float lon){
+        GetDataService.startGetDataService(getContext(), cityName, lat, lon);
     }
     private BroadcastReceiver getDataReceiver = new BroadcastReceiver() { //получаем данные от сервиса
         @Override
@@ -186,20 +191,23 @@ public class CurrentWeatherFragment extends Fragment {
     private void displayWeather(WeatherRequest weatherRequest) throws IOException { //отображаем погоду, в зависимости от настроек (°С или °F)
         if (!metrics.isFahrenheit()) {
             thermometer.changeUnit(true);
-            thermometer.setCurrentTemp(weatherRequest.getMain().getTemp() - 273);
-            temperature.setText(String.format("%d%s", (int) weatherRequest.getMain().getTemp() - 273, "°C"));
+            thermometer.setCurrentTemp(weatherRequest.getMain().getTemp() - 273.15f);
+            temperature.setText(String.format("%.1f%s", weatherRequest.getMain().getTemp() - 273.15f, "°C"));
         }
         else {
             thermometer.changeUnit(false);
-            float temp = (weatherRequest.getMain().getTemp()-273)*1.8f+32;
+            float temp = (weatherRequest.getMain().getTemp()-273.15f)*1.8f+32;
             thermometer.setCurrentTemp(temp);
-            temperature.setText(String.format("%d%s", (int) temp, "°F"));
+            temperature.setText(String.format("%.1f%s", temp, "°F"));
 
         }
         city.setText(weatherRequest.getName());
-        pressure.setText(String.format("%d %s", (int) (weatherRequest.getMain().getPressure() / 1.33), getString(R.string.pressureValue)));
+        sharedPref = requireActivity().getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(CITY_NAME, weatherRequest.getName()).commit();
+        pressure.setText(String.format("%.1f %s", weatherRequest.getMain().getPressure() / 1.33f, getString(R.string.pressureValue)));
         humidity.setText(String.format("%d%s", weatherRequest.getMain().getHumidity(), "%"));
-        windSpeed.setText(String.format("%d %s", (int) weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue)));
+        windSpeed.setText(String.format("%.1f %s", weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue)));
         String imageURL = String.format("https://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon());
         Picasso.get().load(imageURL)
                 .error(R.drawable.cloudy)
@@ -226,14 +234,14 @@ public class CurrentWeatherFragment extends Fragment {
             String dayTemp;
             String nightTemp;
             if (!metrics.isFahrenheit()) {
-                dayTemp = String.format("%d%s", (int) (forecastRequest1.getDaily()[i].getTemp().getDay() - 273), "°C");
-                nightTemp = String.format("%d%s", (int) (forecastRequest1.getDaily()[i].getTemp().getNight() - 273), "°C");
+                dayTemp = String.format("%.1f%s", forecastRequest1.getDaily()[i].getTemp().getDay() - 273.15f, "°C");
+                nightTemp = String.format("%.1f%s", forecastRequest1.getDaily()[i].getTemp().getNight() - 273.15f, "°C");
             }
             else {
-                float dTemp = (forecastRequest1.getDaily()[i].getTemp().getDay()-273)*1.8f+32;
-                float nTemp = (forecastRequest1.getDaily()[i].getTemp().getNight()-273)*1.8f+32;
-                dayTemp = String.format("%d%s", (int) dTemp, "°F");
-                nightTemp = String.format("%d%s", (int) nTemp, "°F");
+                float dTemp = forecastRequest1.getDaily()[i].getTemp().getDay()-273.15f*1.8f+32;
+                float nTemp = forecastRequest1.getDaily()[i].getTemp().getNight()-273.15f*1.8f+32;
+                dayTemp = String.format("%.1f%s", dTemp, "°F");
+                nightTemp = String.format("%.1f%s", nTemp, "°F");
             }
             String weatherIco = forecastRequest1.getDaily()[i].getWeather()[0].getIcon();
             Forecast forecast = new Forecast(dText, dayTemp, nightTemp, weatherIco);

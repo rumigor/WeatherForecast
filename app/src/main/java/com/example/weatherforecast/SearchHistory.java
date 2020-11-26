@@ -103,7 +103,7 @@ public class SearchHistory extends Fragment {
                 Story story = storySource
                         .getStoryList()
                         .get(mCurrentItemPosition);
-                weatherFrameLoading(story.city);
+                weatherFrameLoading(story.city, 0, 0);
                 return true;
             case R.id.remove_context:
                 Story storyForRemove = storySource
@@ -121,13 +121,13 @@ public class SearchHistory extends Fragment {
         }
         return super.onContextItemSelected(item);
     }
-    private void weatherFrameLoading(String city){
+    private void weatherFrameLoading(String city, float lat, float lon){
         cityName = city;
         MainActivity.cityName = city;
         SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(CITY_NAME, cityName).commit();
-        currentWeatherFragment = CurrentWeatherFragment.create(cityName);
+        currentWeatherFragment = CurrentWeatherFragment.create(cityName, lat, lon);
         getActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.mainFragment, currentWeatherFragment)
@@ -135,7 +135,7 @@ public class SearchHistory extends Fragment {
     }
 
     private void clicks(){
-        cityAdapter.setOnCityClickListener(SearchHistory.this::weatherFrameLoading);
+        cityAdapter.setOnCityClickListener(city -> weatherFrameLoading(city, 0, 0));
         cityAdapter.setOnLongItemClickListener((v, position) -> {
             mCurrentItemPosition = position;
             v.showContextMenu();

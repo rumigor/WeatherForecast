@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestPemissions();
         wirelessConnectionLost = new WirelessConnectionLost();
         registerReceiver(wirelessConnectionLost, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
         sharedPref = getPreferences(MODE_PRIVATE);
@@ -73,7 +74,6 @@ public class MainActivity extends AppCompatActivity
         Metrics metrics = Metrics.getInstance();
         metrics.setFahrenheit(sharedPref.getBoolean("METRICS", false));
         setContentView(R.layout.activity_main);
-        requestPemissions();
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
         cityName = sharedPref.getString(CITY_NAME, null);
@@ -126,27 +126,8 @@ public class MainActivity extends AppCompatActivity
 
 
     private void initMain(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            currentWeatherFragment = (CurrentWeatherFragment)
-                    getSupportFragmentManager().findFragmentById(R.id.mainFragment);
+        fragmentLoading();
 
-
-        } else if (currentWeatherFragment == null ) {
-            currentWeatherFragment = new CurrentWeatherFragment();
-
-        }
-        if (!currentWeatherFragment.isInLayout()) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.mainFragment, currentWeatherFragment)
-                    .commit();
-        }
-
-        final String city;
-        if (cityName == null){
-            city = "Saint Petersburg,RU";
-        }
-        else city = cityName;
         Button goToWeb = findViewById(R.id.openInternet);
         goToWeb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,12 +146,7 @@ public class MainActivity extends AppCompatActivity
 //                Uri uri = Uri.parse(url);
 //                Intent browser = new Intent(Intent.ACTION_VIEW, uri);
 //                startActivity(browser);
-                  MapsFragment mapsFragment = new MapsFragment();
-                  getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.mainFragment, mapsFragment)
-                        .addToBackStack("MAPS_FRAGMENT")
-                        .commit();
+                    loadMap();
             }
         });
     }
@@ -226,6 +202,14 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
+        MenuItem map = menu.findItem(R.id.action_map);
+        map.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                loadMap();
+                return true;
+            }
+        });
         return true;
     }
 
@@ -254,8 +238,9 @@ public class MainActivity extends AppCompatActivity
                     .replace(R.id.mainFragment, aboutFragment)
                     .addToBackStack("ABOUT_PROGRAM")
                     .commit();
+        } else if (id == R.id.nav_map){
+            loadMap();
         }
-
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -276,7 +261,7 @@ public class MainActivity extends AppCompatActivity
     }
     private void fragmentLoading(){
 
-        currentWeatherFragment = CurrentWeatherFragment.create(cityName);
+        currentWeatherFragment = CurrentWeatherFragment.create(cityName, lat, lng);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.mainFragment, currentWeatherFragment)
@@ -365,9 +350,9 @@ public class MainActivity extends AppCompatActivity
         // пассивном режиме
         String provider = locationManager.getBestProvider(criteria, true);
         if (provider != null) {
-            // Будем получать геоположение через каждые 10 секунд или каждые
+            // Будем получать геоположение через каждые 10 минут или каждые
             // 10 метров
-            locationManager.requestLocationUpdates(provider, 3600000, 10000, new LocationListener() {
+            locationManager.requestLocationUpdates(provider, 1000, 10000, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
                     lat = (float)location.getLatitude(); // Широта
@@ -415,6 +400,14 @@ public class MainActivity extends AppCompatActivity
                 requestLocation();
             }
         }
+    }
+    private void loadMap(){
+        MapsFragment mapsFragment = new MapsFragment();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.mainFragment, mapsFragment)
+                .addToBackStack("MAPS_FRAGMENT")
+                .commit();
     }
 
 }

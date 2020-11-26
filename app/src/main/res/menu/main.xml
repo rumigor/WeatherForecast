@@ -20,4 +20,10 @@
         android:icon="@android:drawable/ic_menu_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_map"
+        android:orderInCategory="10"
+        android:title="@string/open_map"
+        android:icon="@android:drawable/ic_dialog_map"
+        app:showAsAction="always" />
 </menu>
