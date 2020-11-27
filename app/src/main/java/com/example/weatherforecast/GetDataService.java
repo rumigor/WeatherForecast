@@ -2,6 +2,7 @@ package com.example.weatherforecast;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.Context;
 
@@ -76,10 +77,13 @@ public class GetDataService extends IntentService {
     }
 
     private void makeNote(String message){
+        Intent intent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent, PendingIntent.FLAG_ONE_SHOT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "2")
                 .setSmallIcon(R.drawable.title_small)
                 .setContentTitle("Weather Forecast")
-                .setContentText(message);
+                .setContentText(message)
+                .setContentIntent(pendingIntent);
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(1, builder.build());

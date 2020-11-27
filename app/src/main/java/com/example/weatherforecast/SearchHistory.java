@@ -16,10 +16,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.weatherforecast.cityRecycleView.CityAdapter;
+import com.example.weatherforecast.cityRecycleView.FilteredCityAdapter;
 import com.example.weatherforecast.roomDataBase.App;
 import com.example.weatherforecast.roomDataBase.Story;
 import com.example.weatherforecast.roomDataBase.StoryDao;
@@ -33,12 +35,14 @@ public class SearchHistory extends Fragment {
     private final static String CITY_NAME = "CityName";
     private String cityName;
     private CityAdapter cityAdapter;
+    private FilteredCityAdapter filteredCityAdapter;
     private StorySource storySource;
     private List<Story> cities;
     private RecyclerView recyclerView;
     private int mCurrentItemPosition;
     private TextView cityFilter;
     private Button filter;
+    private boolean isFiltered;
 
     private CurrentWeatherFragment currentWeatherFragment;
 
@@ -65,9 +69,20 @@ public class SearchHistory extends Fragment {
         cityFilter = view.findViewById(R.id.cityFilter);
         filter = view.findViewById(R.id.filter);
         filter.setOnClickListener(v -> {
-            cities = storySource.filterStoryByCityName(cityFilter.getText().toString());
-            cityAdapter = new CityAdapter(storySource);
-            recyclerView.setAdapter(cityAdapter);
+            if (!isFiltered) {
+                InputMethodManager im = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                im.hideSoftInputFromWindow(v.getWindowToken(),0);
+                isFiltered = true;
+                cities = storySource.filterStoryByCityName(cityFilter.getText().toString());
+                filteredCityAdapter = new FilteredCityAdapter(storySource, cityFilter.getText().toString());
+                recyclerView.setAdapter(filteredCityAdapter);
+                filter.setText(R.string.reset_search);
+            }
+            else {
+                isFiltered = false;
+                initRecyclerView(view);
+                filter.setText(R.string.filter_by_city);
+            }
             registerForContextMenu(recyclerView);
             clicks();
         });
@@ -99,24 +114,44 @@ public class SearchHistory extends Fragment {
         int id = item.getItemId();
         switch (id) {
             case R.id.update_context:
-                Story story = storySource
-                        .getStoryList()
-                        .get(mCurrentItemPosition);
+                Story story;
+                if (isFiltered){
+                    story = storySource
+                            .filterStoryByCityName(cityFilter.getText().toString())
+                            .get(mCurrentItemPosition);
+                }
+                else {
+                    story = storySource
+                            .getStoryList()
+                            .get(mCurrentItemPosition);
+                }
                 weatherFrameLoading(story.city);
                 return true;
             case R.id.remove_context:
-                Story storyForRemove = storySource
-                        .getStoryList()
-                        .get(mCurrentItemPosition);
-                storySource.removeStory(storyForRemove.id);
-                cityAdapter.notifyItemRemoved(mCurrentItemPosition);
-                cityAdapter.notifyDataSetChanged();
+                Story storyForRemove;
+                if (isFiltered) {
+                    storyForRemove = storySource
+                            .filterStoryByCityName(cityFilter.getText().toString())
+                            .get(mCurrentItemPosition);
+                    storySource.removeStory(storyForRemove.id);
+                    filteredCityAdapter.notifyItemRemoved(mCurrentItemPosition);
+                    filteredCityAdapter.notifyDataSetChanged();
+                }
+                else {
+                    storyForRemove = storySource
+                            .getStoryList()
+                            .get(mCurrentItemPosition);
+                    storySource.removeStory(storyForRemove.id);
+                    cityAdapter.notifyItemRemoved(mCurrentItemPosition);
+                    cityAdapter.notifyDataSetChanged();
+                }
                 return true;
             case R.id.clear_context:
                 for (int i = 0; i < cities.size(); i++) {
                     storySource.removeStory(cities.get(i).id);
                 }
-                cityAdapter.notifyDataSetChanged();
+                if (isFiltered) {filteredCityAdapter.notifyDataSetChanged();}
+                else {cityAdapter.notifyDataSetChanged();}
         }
         return super.onContextItemSelected(item);
     }
@@ -133,11 +168,19 @@ public class SearchHistory extends Fragment {
                 .commit();
     }
 
-    private void clicks(){
-        cityAdapter.setOnCityClickListener(city -> weatherFrameLoading(city));
-        cityAdapter.setOnLongItemClickListener((v, position) -> {
-            mCurrentItemPosition = position;
-            v.showContextMenu();
-        });
+    private void clicks() {
+        if (!isFiltered) {
+            cityAdapter.setOnCityClickListener(city -> weatherFrameLoading(city));
+            cityAdapter.setOnLongItemClickListener((v, position) -> {
+                mCurrentItemPosition = position;
+                v.showContextMenu();
+            });
+        } else {
+            filteredCityAdapter.setOnCityClickListener(city -> weatherFrameLoading(city));
+            filteredCityAdapter.setOnLongItemClickListener((v, position) -> {
+                mCurrentItemPosition = position;
+                v.showContextMenu();
+            });
+        }
     }
 }

@@ -34,4 +34,7 @@ public interface StoryDao {
 
     @Query("SELECT COUNT() FROM story")
     long getCountStories();
+
+    @Query("SELECT COUNT() FROM story WHERE city = :city")
+    long getFilteredCountStories(String city);
 }

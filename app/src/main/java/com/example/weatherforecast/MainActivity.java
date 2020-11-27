@@ -48,15 +48,9 @@ public class MainActivity extends AppCompatActivity
     private SharedPreferences sharedPref;
     private float lng;
     private float lat;
-    private static final String ACTION_SEND_MSG = "android.intent.action.BATTERY_LOW";
-    private static final String NAME_MSG = "MSG";
-    public static final int FLAG_RECEIVER_INCLUDE_BACKGROUND = 0x01000000;
     private static final int PERMISSION_REQUEST_CODE = 10;
 
-
     CurrentWeatherFragment currentWeatherFragment;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

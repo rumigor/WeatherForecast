@@ -51,4 +51,6 @@ public class StorySource {
         return storyList;
     }
 
+    public long getFilteredStoryCount(String city){return  storyDao.getFilteredCountStories(city);}
+
 }

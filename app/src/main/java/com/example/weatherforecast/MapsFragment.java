@@ -6,7 +6,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.inputmethodservice.Keyboard;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -18,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -52,6 +55,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.getUiSettings().setZoomControlsEnabled(true);
         LatLng latLng = new LatLng(-34, 151);
         lat = (float)latLng.latitude;
         lon = (float)latLng.longitude;
@@ -65,6 +69,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                 textLatitude.setText(new DecimalFormat("#0.000000").format(latLng.latitude));
                 textLongitude.setText(new DecimalFormat("#0.000000").format(latLng.longitude));
+                lat = (float) latLng.latitude;
+                lon = (float) latLng.longitude;
             }
         });
     }
@@ -141,10 +147,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
             requestLocationPermissions();
         }
     }
-    // Запрашиваем координаты
     private void requestLocation() {
-        // Если Permission’а всё- таки нет, просто выходим: приложение не имеет
-        // смысла
         if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             return;
@@ -229,6 +232,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
         view.findViewById(R.id.buttonSearch).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager im = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                im.hideSoftInputFromWindow(v.getWindowToken(),0);
                 final Geocoder geocoder = new Geocoder(requireActivity());
                 final String searchText = textSearch.getText().toString();
                 // Операция получения занимает некоторое время и работает по
@@ -249,6 +254,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
                                         lat = (float)location.latitude;
                                         lon = (float)location.longitude;
                                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, (float)15));
+                                        textLatitude.setText(new DecimalFormat("#0.000000").format(lat));
+                                        textLongitude.setText(new DecimalFormat("#0.000000").format(lon));
                                     }
                                 });
                             }
