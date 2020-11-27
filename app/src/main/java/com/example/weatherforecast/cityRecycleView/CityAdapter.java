@@ -1,4 +1,4 @@
-package com.example.weatherforecast;
+package com.example.weatherforecast.cityRecycleView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,13 +7,14 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.weatherforecast.R;
+import com.example.weatherforecast.roomDataBase.StorySource;
 import com.example.weatherforecast.roomDataBase.Story;
 
 import java.util.List;
 
 public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
     private OnCityClickListener onCityClickListener;
-    private List<Story> cities;
     private StorySource storySource;
 
 
@@ -22,7 +23,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
         this.storySource = storySource;
     }
 
-    onLongItemClickListener mOnLongItemClickListener;
+    public onLongItemClickListener mOnLongItemClickListener;
 
     public void setOnLongItemClickListener(onLongItemClickListener onLongItemClickListener) {
         mOnLongItemClickListener = onLongItemClickListener;
@@ -74,7 +75,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
     }
 
 
-    interface OnCityClickListener {
+    public interface OnCityClickListener {
 
         void onClicked(String city);
     }

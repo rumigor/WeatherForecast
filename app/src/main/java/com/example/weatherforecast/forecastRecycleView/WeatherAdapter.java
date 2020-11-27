@@ -1,10 +1,13 @@
-package com.example.weatherforecast;
+package com.example.weatherforecast.forecastRecycleView;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.weatherforecast.Forecast;
+import com.example.weatherforecast.R;
 
 import java.util.List;
 

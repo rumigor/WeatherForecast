@@ -1,4 +1,4 @@
-package com.example.weatherforecast;
+package com.example.weatherforecast.thermometerView;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,6 +9,8 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.example.weatherforecast.R;
 
 public class Thermometer extends View {
 

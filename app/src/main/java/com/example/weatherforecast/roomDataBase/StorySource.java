@@ -1,4 +1,4 @@
-package com.example.weatherforecast;
+package com.example.weatherforecast.roomDataBase;
 
 import com.example.weatherforecast.roomDataBase.Story;
 import com.example.weatherforecast.roomDataBase.StoryDao;

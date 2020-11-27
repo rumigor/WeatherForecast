@@ -7,8 +7,13 @@ import android.content.Context;
 
 import androidx.core.app.NotificationCompat;
 
-import com.example.weatherforecast.forecast.ForecastRequest;
-import com.example.weatherforecast.model.WeatherRequest;
+import com.example.weatherforecast.forecastModel.ForecastRequest;
+import com.example.weatherforecast.modelCurrentWeather.WeatherRequest;
+import com.example.weatherforecast.retrofit.CurrentWeatherRetrofit;
+import com.example.weatherforecast.retrofit.ForecastRetrofit;
+import com.example.weatherforecast.retrofit.WeatherRetrofitByCoords;
+
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -97,8 +102,12 @@ public class GetDataService extends IntentService {
 
 
     private void requestCurrentWeatherRetrofit(String city, float lat, float lon, String keyApi){
+        String lang;
+        String language = Locale.getDefault().getDisplayLanguage(); //получаем текущий язык системы
+        if (language.equals("русский")){lang = "ru";} //если выбран русский язык, то будем получать данные о погоде на русском языке
+        else {lang = "en";} //иначе на английском
         if (lat == 0 || lon ==0) {
-            currentWeatherRetrofit.loadWeather(city, keyApi)
+            currentWeatherRetrofit.loadWeather(city, keyApi, lang)
                     .enqueue(new Callback<WeatherRequest>() {
                         @Override
                         public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
@@ -116,7 +125,7 @@ public class GetDataService extends IntentService {
                         }
                     });
         } else {
-            weatherRetrofitByCoords.loadWeather(lat, lon, keyApi)
+            weatherRetrofitByCoords.loadWeather(lat, lon, keyApi, lang)
                     .enqueue(new Callback<WeatherRequest>() {
                         @Override
                         public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {

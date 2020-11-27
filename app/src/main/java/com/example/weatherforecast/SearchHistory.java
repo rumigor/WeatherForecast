@@ -1,6 +1,5 @@
 package com.example.weatherforecast;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,12 +19,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.weatherforecast.cityRecycleView.CityAdapter;
 import com.example.weatherforecast.roomDataBase.App;
 import com.example.weatherforecast.roomDataBase.Story;
 import com.example.weatherforecast.roomDataBase.StoryDao;
+import com.example.weatherforecast.roomDataBase.StorySource;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -103,7 +102,7 @@ public class SearchHistory extends Fragment {
                 Story story = storySource
                         .getStoryList()
                         .get(mCurrentItemPosition);
-                weatherFrameLoading(story.city, 0, 0);
+                weatherFrameLoading(story.city);
                 return true;
             case R.id.remove_context:
                 Story storyForRemove = storySource
@@ -121,13 +120,13 @@ public class SearchHistory extends Fragment {
         }
         return super.onContextItemSelected(item);
     }
-    private void weatherFrameLoading(String city, float lat, float lon){
+    private void weatherFrameLoading(String city){
         cityName = city;
         MainActivity.cityName = city;
         SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(CITY_NAME, cityName).commit();
-        currentWeatherFragment = CurrentWeatherFragment.create(cityName, lat, lon);
+        currentWeatherFragment = CurrentWeatherFragment.create(cityName, (float) 0, (float) 0);
         getActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.mainFragment, currentWeatherFragment)
@@ -135,7 +134,7 @@ public class SearchHistory extends Fragment {
     }
 
     private void clicks(){
-        cityAdapter.setOnCityClickListener(city -> weatherFrameLoading(city, 0, 0));
+        cityAdapter.setOnCityClickListener(city -> weatherFrameLoading(city));
         cityAdapter.setOnLongItemClickListener((v, position) -> {
             mCurrentItemPosition = position;
             v.showContextMenu();

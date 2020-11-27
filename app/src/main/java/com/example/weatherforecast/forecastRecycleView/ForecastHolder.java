@@ -1,4 +1,4 @@
-package com.example.weatherforecast;
+package com.example.weatherforecast.forecastRecycleView;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -7,6 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.weatherforecast.R;
 import com.squareup.picasso.Picasso;
 
 public class ForecastHolder extends RecyclerView.ViewHolder{

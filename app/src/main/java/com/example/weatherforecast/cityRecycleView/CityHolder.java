@@ -1,17 +1,15 @@
-package com.example.weatherforecast;
+package com.example.weatherforecast.cityRecycleView;
 
-import android.app.Activity;
-import android.view.ContextMenu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.weatherforecast.Metrics;
+import com.example.weatherforecast.R;
 import com.example.weatherforecast.roomDataBase.Story;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -32,10 +30,9 @@ public class CityHolder extends RecyclerView.ViewHolder {
     void bind(final Story cities, final CityAdapter.OnCityClickListener onCityClickListener) {
         cityName.setText(cities.city);
         if (Metrics.getInstance().isFahrenheit()){
-            lastTemp.setText((new DecimalFormat("#0.0").format((cities.temperature-273.15)*9/5+32))
-                     +"°F");
+            lastTemp.setText(String.format("%+.1f", (cities.temperature-273.15)*9/5+32)+"°F");
         } else {
-            lastTemp.setText((new DecimalFormat("#0.0").format(cities.temperature-273.15f))+"°C");
+            lastTemp.setText(String.format("%+.1f",(cities.temperature-273.15f))+"°C");
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

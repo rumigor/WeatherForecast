@@ -28,17 +28,20 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.weatherforecast.forecast.ForecastRequest;
-import com.example.weatherforecast.model.WeatherRequest;
+import com.example.weatherforecast.forecastModel.ForecastRequest;
+import com.example.weatherforecast.forecastRecycleView.WeatherAdapter;
+import com.example.weatherforecast.modelCurrentWeather.WeatherRequest;
 import com.example.weatherforecast.roomDataBase.App;
+import com.example.weatherforecast.roomDataBase.GetStoryData;
 import com.example.weatherforecast.roomDataBase.Story;
 import com.example.weatherforecast.roomDataBase.StoryDao;
+import com.example.weatherforecast.roomDataBase.StorySource;
+import com.example.weatherforecast.thermometerView.Thermometer;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -194,13 +197,13 @@ public class CurrentWeatherFragment extends Fragment {
         if (!metrics.isFahrenheit()) {
             thermometer.changeUnit(true);
             thermometer.setCurrentTemp(weatherRequest.getMain().getTemp() - 273.15f);
-            temperature.setText(String.format("%.1f%s", weatherRequest.getMain().getTemp() - 273.15f, "°C"));
+            temperature.setText(String.format("%+.1f%s", weatherRequest.getMain().getTemp() - 273.15f, "°C"));
         }
         else {
             thermometer.changeUnit(false);
             float temp = (weatherRequest.getMain().getTemp()-273.15f)*1.8f+32;
             thermometer.setCurrentTemp(temp);
-            temperature.setText(String.format("%.1f%s", temp, "°F"));
+            temperature.setText(String.format("%+.1f%s", temp, "°F"));
 
         }
         city.setText(weatherRequest.getName());
@@ -209,23 +212,25 @@ public class CurrentWeatherFragment extends Fragment {
         editor.putString(CITY_NAME, weatherRequest.getName()).commit();
         pressure.setText(String.format("%.1f %s", weatherRequest.getMain().getPressure() / 1.33f, getString(R.string.pressureValue)));
         humidity.setText(String.format("%d%s", weatherRequest.getMain().getHumidity(), "%"));
-        windSpeed.setText(String.format("%.1f %s", weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue)));
+        windSpeed.setText(String.format("%.1f %s %s", weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue), getWindDirection(weatherRequest.getWind().getDeg())));
         weatherCondition.setText(weatherRequest.getWeather()[0].getDescription());
         String imageURL = String.format("https://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon());
         Picasso.get().load(imageURL)
                 .error(R.drawable.cloudy)
                 .into(currentWeather);
-        StoryDao storyDao = App
-                .getInstance()
-                .getStoryDao();
-        storySource = new StorySource(storyDao);
-        List<Story> cities = storySource.getStoryList();
-        for (int i = 0; i < cities.size(); i++) {
-            if (cities.get(i).city.equals(weatherRequest.getName()) && cities.get(i).date == weatherRequest.getDt()){
-                return;
+        new Thread(() -> {
+            StoryDao storyDao = App
+                    .getInstance()
+                    .getStoryDao();
+            storySource = new StorySource(storyDao);
+            List<Story> cities = storySource.getStoryList();
+            for (int i = 0; i < cities.size(); i++) {
+                if (cities.get(i).city.equals(weatherRequest.getName()) && cities.get(i).date == weatherRequest.getDt()){
+                    return;
+                }
             }
-        }
-        storySource.addStory(new GetStoryData(weatherRequest).UpdateStory());
+            storySource.addStory(new GetStoryData(weatherRequest).UpdateStory());
+        }).start();
     }
 
     private void displayForecast(ForecastRequest forecastRequest1) { //отображаем прогноз, в зависимости от настроек (°С или °F)
@@ -237,14 +242,14 @@ public class CurrentWeatherFragment extends Fragment {
             String dayTemp;
             String nightTemp;
             if (!metrics.isFahrenheit()) {
-                dayTemp = String.format("%.1f%s", forecastRequest1.getDaily()[i].getTemp().getDay() - 273.15f, "°C");
-                nightTemp = String.format("%.1f%s", forecastRequest1.getDaily()[i].getTemp().getNight() - 273.15f, "°C");
+                dayTemp = String.format("%+.1f%s", forecastRequest1.getDaily()[i].getTemp().getDay() - 273.15f, "°C");
+                nightTemp = String.format("%+.1f%s", forecastRequest1.getDaily()[i].getTemp().getNight() - 273.15f, "°C");
             }
             else {
                 float dTemp = (forecastRequest1.getDaily()[i].getTemp().getDay()-273.15f)*1.8f+32;
                 float nTemp = (forecastRequest1.getDaily()[i].getTemp().getNight()-273.15f)*1.8f+32;
-                dayTemp = String.format("%.1f%s", dTemp, "°F");
-                nightTemp = String.format("%.1f%s", nTemp, "°F");
+                dayTemp = String.format("%+.1f%s", dTemp, "°F");
+                nightTemp = String.format("%+.1f%s", nTemp, "°F");
             }
             String weatherIco = forecastRequest1.getDaily()[i].getWeather()[0].getIcon();
             Forecast forecast = new Forecast(dText, dayTemp, nightTemp, weatherIco);
@@ -262,8 +267,14 @@ public class CurrentWeatherFragment extends Fragment {
             notificationManager.createNotificationChannel(mChannel);
         }
     }
-
-
-
-
+    private String getWindDirection(int degree){
+        if (degree < 23 || degree >= 338) return getString(R.string.North);
+        else if (degree < 68) return getString(R.string.NorthEast);
+        else if (degree < 113) return getString(R.string.East);
+        else if (degree < 158) return getString(R.string.SouthEast);
+        else if (degree < 203) return getString(R.string.South);
+        else if (degree < 248) return getString(R.string.SouthWest);
+        else if (degree < 293) return getString(R.string.West);
+        else return getString(R.string.NorthWest);
+    }
 }

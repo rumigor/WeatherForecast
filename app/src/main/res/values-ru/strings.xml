@@ -60,4 +60,12 @@
     <string name="open_map">Открыть карту</string>
     <string name="view_weather">Показать погоду</string>
     <string name="weather_condition">Состояние погоды</string>
+    <string name="North">С</string>
+    <string name="NorthEast">СВ</string>
+    <string name="East">В</string>
+    <string name="SouthEast">ЮВ</string>
+    <string name="South">Ю</string>
+    <string name="SouthWest">ЮЗ</string>
+    <string name="West">З</string>
+    <string name="NorthWest">СЗ</string>
 </resources>

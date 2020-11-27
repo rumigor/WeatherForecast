@@ -1,4 +1,4 @@
-package com.example.weatherforecast;
+package com.example.weatherforecast.thermometerView;
 
 import android.content.Context;
 import android.content.res.Resources;

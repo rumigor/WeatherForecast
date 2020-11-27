@@ -12,15 +12,12 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,8 +30,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.example.weatherforecast.model.OnDialogListener;
-import com.google.android.gms.maps.model.LatLng;
+import com.example.weatherforecast.modelCurrentWeather.OnDialogListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
@@ -65,10 +61,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPref = getPreferences(MODE_PRIVATE);
+        cityName = sharedPref.getString(CITY_NAME, null);
         requestPemissions();
         wirelessConnectionLost = new WirelessConnectionLost();
         registerReceiver(wirelessConnectionLost, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
-        sharedPref = getPreferences(MODE_PRIVATE);
         initNotificationChannel();
         initNotificationChannel2();
         Metrics metrics = Metrics.getInstance();
@@ -77,7 +74,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
         cityName = sharedPref.getString(CITY_NAME, null);
-        initMain(savedInstanceState);
         initGetToken();
 
     }
@@ -125,9 +121,9 @@ public class MainActivity extends AppCompatActivity
 
 
 
-    private void initMain(Bundle savedInstanceState) {
-        fragmentLoading(cityName, lat, lng);
-    }
+//    private void initMain(Bundle savedInstanceState) {
+//        fragmentLoading(cityName, lat, lng);
+//    }
 
     @Override
     public void onBackPressed() {
@@ -137,6 +133,11 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -255,6 +256,7 @@ public class MainActivity extends AppCompatActivity
                 metrics.setFahrenheit(false);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("METRICS", metrics.isFahrenheit()).commit();
+                cityName = sharedPref.getString(CITY_NAME, cityName);
                 fragmentLoading(cityName, 0, 0);
             }
         }
@@ -267,6 +269,7 @@ public class MainActivity extends AppCompatActivity
                 metrics.setFahrenheit(true);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("METRICS", metrics.isFahrenheit()).commit();
+                cityName = sharedPref.getString(CITY_NAME, cityName);
                 fragmentLoading(cityName,0,0);
             }
         }
@@ -310,8 +313,11 @@ public class MainActivity extends AppCompatActivity
     // Запрашиваем координаты
     private void requestLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            fragmentLoading(cityName, 0, 0);
             return;
+        }
+
         // Получаем менеджер геолокаций
         LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -320,11 +326,12 @@ public class MainActivity extends AppCompatActivity
         if (provider != null) {
             // Будем получать геоположение через каждые 10 минут или каждые
             // 10 метров
-            locationManager.requestLocationUpdates(provider, 1000, 10000, new LocationListener() {
+            locationManager.requestLocationUpdates(provider, 10000, 10000, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
                     lat = (float)location.getLatitude(); // Широта
                     lng = (float)location.getLongitude(); // Долгота
+                    fragmentLoading(cityName, lat, lng);
                 }
 
                 @Override

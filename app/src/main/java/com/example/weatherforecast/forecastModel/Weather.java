@@ -1,4 +1,4 @@
-package com.example.weatherforecast.forecast;
+package com.example.weatherforecast.forecastModel;
 
 import java.io.Serializable;
 

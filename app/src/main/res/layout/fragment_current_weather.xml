@@ -22,7 +22,7 @@
         android:id="@+id/forecastTitle2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="24dp"
         android:text="@string/forecast"
         android:textColor="#FFEBEE"
         android:textSize="24sp"
@@ -32,9 +32,8 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/weatherRecyclerView"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,7 +41,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="401dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -51,9 +50,9 @@
         app:layout_constraintTop_toBottomOf="@+id/weatherIco"
         app:layout_constraintVertical_bias="0.0">
 
-        <com.example.weatherforecast.Thermometer
+        <com.example.weatherforecast.thermometerView.Thermometer
             android:id="@+id/thermometer"
-            android:layout_width="91dp"
+            android:layout_width="66dp"
             android:layout_height="267dp"
             android:layout_centerHorizontal="true"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
@@ -66,8 +65,8 @@
             app:radius="60dp" />
 
         <TableLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:gravity="center_horizontal|center_vertical">
 
             <TableRow
@@ -82,7 +81,7 @@
 
                 <EditText
                     android:id="@+id/textCity"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:enabled="false"
@@ -104,7 +103,7 @@
 
                 <EditText
                     android:id="@+id/textTemprature"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:enabled="false"
@@ -114,8 +113,8 @@
             </TableRow>
 
             <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/textView7"
@@ -131,7 +130,8 @@
                     android:enabled="false"
                     android:inputType="textPersonName"
                     android:text=""
-                    android:textColor="@android:color/holo_orange_light" />
+                    android:textColor="@android:color/holo_orange_light"
+                    android:textSize="14sp" />
             </TableRow>
 
             <TableRow
@@ -146,7 +146,7 @@
 
                 <EditText
                     android:id="@+id/textPressure"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:enabled="false"
@@ -167,7 +167,7 @@
 
                 <EditText
                     android:id="@+id/textHumidity"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:enabled="false"
@@ -189,7 +189,7 @@
 
                 <EditText
                     android:id="@+id/textWindspeed"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:enabled="false"

@@ -1,6 +1,6 @@
-package com.example.weatherforecast;
+package com.example.weatherforecast.retrofit;
 
-import com.example.weatherforecast.forecast.ForecastRequest;
+import com.example.weatherforecast.forecastModel.ForecastRequest;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

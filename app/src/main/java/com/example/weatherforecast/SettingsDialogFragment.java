@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 
-import com.example.weatherforecast.model.OnDialogListener;
+import com.example.weatherforecast.modelCurrentWeather.OnDialogListener;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class SettingsDialogFragment extends BottomSheetDialogFragment{
