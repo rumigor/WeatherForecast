@@ -18,6 +18,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,8 +33,14 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.weatherforecast.modelCurrentWeather.OnDialogListener;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
@@ -49,6 +57,20 @@ public class MainActivity extends AppCompatActivity
     private float lng;
     private float lat;
     private static final int PERMISSION_REQUEST_CODE = 10;
+
+    // Используется, чтобы определить результат Activity регистрации через
+    // Google
+    private static final int RC_SIGN_IN = 40404;
+    private static final String TAG = "GoogleAuth";
+
+    // Клиент для регистрации пользователя через Google
+    private GoogleSignInClient googleSignInClient;
+
+    // Кнопка регистрации через Google
+    private com.google.android.gms.common.SignInButton buttonSignIn;
+
+    // Кнопка выхода из Гугл
+    private MaterialButton buttonSingOut;
 
     CurrentWeatherFragment currentWeatherFragment;
 
@@ -69,6 +91,39 @@ public class MainActivity extends AppCompatActivity
         initDrawer(toolbar);
         cityName = sharedPref.getString(CITY_NAME, null);
         initGetToken();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(this, gso);
+        buttonSignIn = findViewById(R.id.sign_in_button);
+        buttonSingOut = findViewById(R.id.sing_out_button);
+        buttonSignIn.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                signIn();
+                                            }
+                                        }
+        );
+
+        buttonSingOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Проверим, входил ли пользователь в это приложение через Google
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            // Пользователь уже входил, сделаем кнопку недоступной
+            buttonSignIn.setEnabled(false);
+            // Обновим почтовый адрес этого пользователя и выведем его на экран
+            updateUI(account.getEmail());
+        }
 
     }
 
@@ -106,6 +161,7 @@ public class MainActivity extends AppCompatActivity
     private void initDrawer(Toolbar toolbar) {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -113,11 +169,6 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-
-
-//    private void initMain(Bundle savedInstanceState) {
-//        fragmentLoading(cityName, lat, lng);
-//    }
 
     @Override
     public void onBackPressed() {
@@ -230,7 +281,62 @@ public class MainActivity extends AppCompatActivity
             recreate();
 
         }
+        if (requestCode == RC_SIGN_IN) {
+            // Когда сюда возвращается Task, результаты по нему уже готовы.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
     }
+
+    private void signIn() {
+        Intent signInIntent = googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    // Выход из учетной записи в приложении
+    private void signOut() {
+        googleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        updateUI("email");
+                        enableSign();
+                    }
+                });
+    }
+
+    //https://developers.google.com/identity/sign-in/android/backend-auth?authuser=1
+    // Получение данных пользователя
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+
+            // Регистрация прошла успешно
+            disableSign();
+            updateUI(account.getEmail());
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+        }
+    }
+
+    // Обновить данные о пользователе на экране
+    private void updateUI(String e_mail) {
+        TextView email = findViewById(R.id.email);
+        email.setText(e_mail);
+    }
+
+    private void enableSign(){
+        buttonSignIn.setEnabled(true);
+        buttonSingOut.setEnabled(false);
+    }
+
+    private void disableSign(){
+        buttonSignIn.setEnabled(false);
+        buttonSingOut.setEnabled(true);
+    }
+
     private void fragmentLoading(String cityName, float lat, float lng){
 
         currentWeatherFragment = CurrentWeatherFragment.create(cityName, lat, lng);
@@ -327,17 +433,16 @@ public class MainActivity extends AppCompatActivity
                     lng = (float)location.getLongitude(); // Долгота
                     fragmentLoading(cityName, lat, lng);
                 }
-
+            });
+        } else fragmentLoading(cityName, lat, lng);
+        if (lat == 0 && lng ==0){
+            provider = LocationManager.NETWORK_PROVIDER;
+            locationManager.requestLocationUpdates(provider, 10000, 1000, new LocationListener() {
                 @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-                }
-
-                @Override
-                public void onProviderEnabled(String provider) {
-                }
-
-                @Override
-                public void onProviderDisabled(String provider) {
+                public void onLocationChanged(@NonNull Location location) {
+                    lat = (float)location.getLatitude(); // Широта
+                    lng = (float)location.getLongitude(); // Долгота
+                    fragmentLoading(cityName, lat, lng);
                 }
             });
         }

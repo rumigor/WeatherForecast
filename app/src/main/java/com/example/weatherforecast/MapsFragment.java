@@ -198,6 +198,28 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
                 }
             });
         }
+        if (lat == 0 && lon ==0){
+            provider = LocationManager.NETWORK_PROVIDER;
+            locationManager.requestLocationUpdates(provider, 10000, 1000, new LocationListener() {
+                @Override
+                public void onLocationChanged(@NonNull Location location) {
+                    double latd = location.getLatitude(); // Широта
+                    String latitude = Double.toString(latd);
+                    textLatitude.setText(latitude);
+
+                    double lng = location.getLongitude(); // Долгота
+                    String longitude = Double.toString(lng);
+                    textLongitude.setText(longitude);
+                    lat = (float) latd;
+                    lon = (float) lng;
+                    String accuracy = Float.toString(location.getAccuracy());   // Точность
+
+                    LatLng currentPosition = new LatLng(latd, lng);
+                    currentMarker.setPosition(currentPosition);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, (float)12));
+                }
+            });
+        }
     }
 
     // Запрашиваем Permission’ы для геолокации
