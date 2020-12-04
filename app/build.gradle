@@ -6,6 +6,7 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
 
+
     defaultConfig {
         applicationId "com.example.weatherforecast"
         minSdkVersion 24
@@ -36,6 +37,19 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    flavorDimensions 'Version'
+    productFlavors {
+        map {
+            dimension 'Version'
+            applicationIdSuffix '.map'
+            versionNameSuffix '.map'
+        }
+        noMap {
+            dimension 'Version'
+            applicationIdSuffix '.noMap'
+            versionNameSuffix '.noMap'
+        }
+    }
 }
 
 dependencies {
@@ -65,4 +79,18 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     apply plugin: 'com.google.gms.google-services'
+}
+
+gradle.taskGraph.beforeTask { Task task ->
+    if(task.name ==~ /process.*GoogleServices/) {
+        android.applicationVariants.all { variant ->
+            if(task.name ==~ /(?i)process${variant.name}GoogleServices/){
+                copy {
+                    from "/src/${variant.flavorName}"
+                    into '.'
+                    include 'google-services.json'
+                }
+            }
+        }
+    }
 }

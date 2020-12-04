@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity
     private float lng;
     private float lat;
     private static final int PERMISSION_REQUEST_CODE = 10;
+    private NavigationView navigationView;
+    private View header;
 
     // Используется, чтобы определить результат Activity регистрации через
     // Google
@@ -89,14 +91,14 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
-        cityName = sharedPref.getString(CITY_NAME, null);
         initGetToken();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
-        buttonSignIn = findViewById(R.id.sign_in_button);
-        buttonSingOut = findViewById(R.id.sing_out_button);
+        header = navigationView.getHeaderView(0);
+        buttonSignIn = header.findViewById(R.id.sign_in_button);
+        buttonSingOut = header.findViewById(R.id.sing_out_button);
         buttonSignIn.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
@@ -121,6 +123,7 @@ public class MainActivity extends AppCompatActivity
         if (account != null) {
             // Пользователь уже входил, сделаем кнопку недоступной
             buttonSignIn.setEnabled(false);
+            buttonSignIn.setVisibility(View.GONE);
             // Обновим почтовый адрес этого пользователя и выведем его на экран
             updateUI(account.getEmail());
         }
@@ -160,7 +163,7 @@ public class MainActivity extends AppCompatActivity
 
     private void initDrawer(Toolbar toolbar) {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -323,7 +326,7 @@ public class MainActivity extends AppCompatActivity
 
     // Обновить данные о пользователе на экране
     private void updateUI(String e_mail) {
-        TextView email = findViewById(R.id.email);
+        TextView email = header.findViewById(R.id.email);
         email.setText(e_mail);
     }
 

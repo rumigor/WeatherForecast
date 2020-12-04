@@ -41,7 +41,7 @@
         android:id="@+id/mainFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/gbuttons"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,36 +49,6 @@
 
     </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/gbuttons"
-        android:layout_width="0dp"
-        android:layout_height="61dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainFragment"
-        app:layout_constraintVertical_bias="1.0">
 
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/sign_in_button"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/sing_out_button"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/sign_out"
-            android:textColor="#FFFFFF" />
-
-        <TextView
-            android:id="@+id/email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Login in" />
-
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
