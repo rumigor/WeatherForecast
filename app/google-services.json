@@ -34,6 +34,64 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:347184433809:android:383c3b4e73fc2ef4df0d30",
+        "android_client_info": {
+          "package_name": "com.example.weatherforecast.map"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "347184433809-huhpg2fqevnm2meo2vrcft2m7g3l6klf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBv2RDEoXlt6hbsW2lTHt363VdgUNXt1LI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "347184433809-huhpg2fqevnm2meo2vrcft2m7g3l6klf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:347184433809:android:d18127dae52c0f9adf0d30",
+        "android_client_info": {
+          "package_name": "com.example.weatherforecast.noMap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "347184433809-huhpg2fqevnm2meo2vrcft2m7g3l6klf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBv2RDEoXlt6hbsW2lTHt363VdgUNXt1LI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "347184433809-huhpg2fqevnm2meo2vrcft2m7g3l6klf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
