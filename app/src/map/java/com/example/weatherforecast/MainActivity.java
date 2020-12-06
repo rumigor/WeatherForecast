@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity
             buttonSignIn.setEnabled(false);
             buttonSignIn.setVisibility(View.GONE);
             // Обновим почтовый адрес этого пользователя и выведем его на экран
-            updateUI(account.getEmail());
+            updateUI(account.getDisplayName());
         }
 
     }
@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        updateUI("email");
+                        updateUI("User Name");
                         enableSign();
                     }
                 });
@@ -316,7 +316,7 @@ public class MainActivity extends AppCompatActivity
 
             // Регистрация прошла успешно
             disableSign();
-            updateUI(account.getEmail());
+            updateUI(account.getDisplayName());
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
@@ -325,18 +325,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     // Обновить данные о пользователе на экране
-    private void updateUI(String e_mail) {
-        TextView email = header.findViewById(R.id.email);
-        email.setText(e_mail);
+    private void updateUI(String userName) {
+        TextView displayName = header.findViewById(R.id.displayName);
+       displayName.setText(userName);
     }
 
     private void enableSign(){
+        buttonSignIn.setVisibility(View.VISIBLE);
         buttonSignIn.setEnabled(true);
         buttonSingOut.setEnabled(false);
     }
 
     private void disableSign(){
         buttonSignIn.setEnabled(false);
+        buttonSignIn.setVisibility(View.GONE);
         buttonSingOut.setEnabled(true);
     }
 
