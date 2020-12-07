@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity
     // Кнопка выхода из Гугл
     private MaterialButton buttonSingOut;
 
-    CurrentWeatherFragment currentWeatherFragment;
+    WeatherFragment weatherFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -348,10 +348,10 @@ public class MainActivity extends AppCompatActivity
 
     private void fragmentLoading(String cityName, float lat, float lng){
 
-        currentWeatherFragment = CurrentWeatherFragment.create(cityName, lat, lng);
+        weatherFragment = WeatherFragment.create(cityName, lat, lng);
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.mainFragment, currentWeatherFragment)
+                .replace(R.id.mainFragment, weatherFragment)
                 .addToBackStack("WEATHER_FRAGMENT")
                 .commit();
     }

@@ -52,7 +52,7 @@ import java.util.Objects;
 import static android.content.Context.MODE_PRIVATE;
 
 
-public class CurrentWeatherFragment extends Fragment {
+public class WeatherFragment extends Fragment {
 
     private static final String CITY_NAME ="CityName";
     private static final String LATITUDE = "LATITUDE";
@@ -64,25 +64,18 @@ public class CurrentWeatherFragment extends Fragment {
     private float lat;
     private float lon;
 
-    private EditText city;
-    private EditText temperature;
-    private EditText pressure;
-    private EditText humidity;
-    private EditText windSpeed;
-    private ImageView currentWeather;
-    private Thermometer thermometer;
-    private EditText weatherCondition;
+
     private Metrics metrics;
     private StorySource storySource;
     private WeatherRequest weatherRequest;
     private ForecastRequest forecastRequest;
-    private TextView dateTime;
 
 
 
 
-    public static CurrentWeatherFragment create(String cityName, float lat, float lon) {
-        CurrentWeatherFragment fragment = new CurrentWeatherFragment();
+
+    public static WeatherFragment create(String cityName, float lat, float lon) {
+        WeatherFragment fragment = new WeatherFragment();
         Bundle args = new Bundle();
         args.putString(CITY_NAME, cityName);
         args.putFloat(LATITUDE, lat);
@@ -106,7 +99,6 @@ public class CurrentWeatherFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
             cityName = getArguments().getString(CITY_NAME);
             lat = getArguments().getFloat(LATITUDE);
@@ -122,13 +114,12 @@ public class CurrentWeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_current_weather, container, false);
+        return inflater.inflate(R.layout.fragment_weather, container, false);
 
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        init(view);
         initNotificationChannel();
         final RecyclerView recyclerView = view.findViewById(R.id.weatherRecyclerView);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));}
@@ -141,23 +132,13 @@ public class CurrentWeatherFragment extends Fragment {
             metrics = Metrics.getInstance();
             weatherRequest = (WeatherRequest) savedInstanceState.getSerializable("CURRENT_WEATHER");
             forecastRequest = (ForecastRequest) savedInstanceState.getSerializable("FORECAST");
-            if (weatherRequest != null) {displayCurrentWeather(weatherRequest);}
+            if (weatherRequest != null) {loadCurrentWeather();}
             if (forecastRequest != null) {displayForecast(forecastRequest);}
         } else dataLoading(cityName, lat, lon);
 
     }
 
-    private void init(View view){
-        city = view.findViewById(R.id.textCity);
-        temperature = view.findViewById(R.id.textTemprature);
-        pressure = view.findViewById(R.id.textPressure);
-        humidity =view.findViewById(R.id.textHumidity);
-        windSpeed = view.findViewById(R.id.textWindspeed);
-        currentWeather = view.findViewById(R.id.weatherIco);
-        weatherCondition = view.findViewById(R.id.textWeatherCondition);
-        thermometer = view.findViewById(R.id.thermometer);
-        dateTime = view.findViewById(R.id.dateTime);
-    }
+
 
     //Загружаем информацию
     private void dataLoading(String cityName, float lat, float lon){
@@ -207,7 +188,7 @@ public class CurrentWeatherFragment extends Fragment {
         }
     };
     private void displayWeather(WeatherRequest weatherRequest) throws IOException { //отображаем погоду, в зависимости от настроек (°С или °F)
-        displayCurrentWeather(weatherRequest);
+        loadCurrentWeather();
         new Thread(() -> {
             StoryDao storyDao = App
                     .getInstance()
@@ -223,35 +204,7 @@ public class CurrentWeatherFragment extends Fragment {
         }).start();
     }
 
-    private void displayCurrentWeather(WeatherRequest weatherRequest){
-        if (!metrics.isFahrenheit()) {
-            thermometer.changeUnit(true);
-            thermometer.setCurrentTemp(weatherRequest.getMain().getTemp() - 273.15f);
-            temperature.setText(String.format("%+.1f%s", weatherRequest.getMain().getTemp() - 273.15f, "°C"));
-        }
-        else {
-            thermometer.changeUnit(false);
-            float temp = (weatherRequest.getMain().getTemp()-273.15f)*1.8f+32;
-            thermometer.setCurrentTemp(temp);
-            temperature.setText(String.format("%+.1f%s", temp, "°F"));
 
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM \nHH:mm", Locale.getDefault());
-        Date date = new Date(weatherRequest.getDt()*1000);
-        dateTime.setText(sdf.format(date));
-        city.setText(weatherRequest.getName());
-        sharedPref = requireActivity().getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(CITY_NAME, weatherRequest.getName()).commit();
-        pressure.setText(String.format("%.1f %s", weatherRequest.getMain().getPressure() / 1.33f, getString(R.string.pressureValue)));
-        humidity.setText(String.format("%d%s", weatherRequest.getMain().getHumidity(), "%"));
-        windSpeed.setText(String.format("%.1f %s %s", weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue), getWindDirection(weatherRequest.getWind().getDeg())));
-        weatherCondition.setText(weatherRequest.getWeather()[0].getDescription());
-        String imageURL = String.format("https://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon());
-        Picasso.get().load(imageURL)
-                .error(R.drawable.cloudy)
-                .into(currentWeather);
-    }
     private void displayForecast(ForecastRequest forecastRequest1) { //отображаем прогноз, в зависимости от настроек (°С или °F)
         ArrayList<Forecast> forecasts = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM", Locale.getDefault());
@@ -286,22 +239,20 @@ public class CurrentWeatherFragment extends Fragment {
             notificationManager.createNotificationChannel(mChannel);
         }
     }
-    private String getWindDirection(int degree){
-        if (degree < 23 || degree >= 338) return getString(R.string.North);
-        else if (degree < 68) return getString(R.string.NorthEast);
-        else if (degree < 113) return getString(R.string.East);
-        else if (degree < 158) return getString(R.string.SouthEast);
-        else if (degree < 203) return getString(R.string.South);
-        else if (degree < 248) return getString(R.string.SouthWest);
-        else if (degree < 293) return getString(R.string.West);
-        else return getString(R.string.NorthWest);
-    }
+
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("CURRENT_WEATHER", weatherRequest);
         outState.putSerializable("FORECAST", forecastRequest);
+    }
+    private void loadCurrentWeather(){
+        CurrentWeather currentWeather = CurrentWeather.create(weatherRequest);
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.weatherFragment, currentWeather)
+                .commit();
     }
 
 }

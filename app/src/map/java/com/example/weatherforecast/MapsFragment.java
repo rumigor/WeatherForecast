@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.inputmethodservice.Keyboard;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -24,7 +23,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -126,10 +124,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback{
         viewWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CurrentWeatherFragment currentWeatherFragment = CurrentWeatherFragment.create(null, lat, lon);
+                WeatherFragment weatherFragment = WeatherFragment.create(null, lat, lon);
                 requireActivity().getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.mainFragment, currentWeatherFragment)
+                        .replace(R.id.mainFragment, weatherFragment)
                         .addToBackStack("WEATHER_FRAGMENT")
                         .commit();
             }

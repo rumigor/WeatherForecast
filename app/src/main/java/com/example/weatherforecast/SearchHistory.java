@@ -44,7 +44,7 @@ public class SearchHistory extends Fragment {
     private Button filter;
     private boolean isFiltered;
 
-    private CurrentWeatherFragment currentWeatherFragment;
+    private WeatherFragment weatherFragment;
 
     public SearchHistory() {}
 
@@ -177,10 +177,10 @@ public class SearchHistory extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(CITY_NAME, cityName).commit();
-        currentWeatherFragment = CurrentWeatherFragment.create(cityName, (float) 0, (float) 0);
+        weatherFragment = WeatherFragment.create(cityName, (float) 0, (float) 0);
         getActivity().getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.mainFragment, currentWeatherFragment)
+                .replace(R.id.mainFragment, weatherFragment)
                 .commit();
     }
 
