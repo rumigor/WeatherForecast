@@ -64,6 +64,15 @@ public class SearchHistory extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initRecyclerView(view);
+        cityFilter = view.findViewById(R.id.cityFilter);
+        filter = view.findViewById(R.id.filter);
+        if (savedInstanceState != null){
+            isFiltered = savedInstanceState.getBoolean("FILTER_ON", false);
+            if (isFiltered){
+                cityFilter.setText(savedInstanceState.getString("CITY_NAME"));
+                filtered();
+            }
+        }
         registerForContextMenu(recyclerView);
         clicks();
         cityFilter = view.findViewById(R.id.cityFilter);
@@ -87,6 +96,13 @@ public class SearchHistory extends Fragment {
             clicks();
         });
 
+    }
+
+    private void filtered(){
+        cities = storySource.filterStoryByCityName(cityFilter.getText().toString());
+        filteredCityAdapter = new FilteredCityAdapter(storySource, cityFilter.getText().toString());
+        recyclerView.setAdapter(filteredCityAdapter);
+        filter.setText(R.string.reset_search);
     }
     private void initRecyclerView(View view){
         recyclerView = view.findViewById(R.id.cityRecycler);
@@ -182,5 +198,12 @@ public class SearchHistory extends Fragment {
                 v.showContextMenu();
             });
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("FILTER_ON", isFiltered);
+        outState.putString("CITY_NAME", cityFilter.getText().toString());
     }
 }

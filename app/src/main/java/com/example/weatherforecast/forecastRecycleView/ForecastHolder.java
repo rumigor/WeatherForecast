@@ -49,7 +49,7 @@ public class ForecastHolder extends RecyclerView.ViewHolder{
     }
 
     private void setPic(String wCond) {
-        String imageURL = String.format("https://openweathermap.org/img/wn/%s@2x.png", wCond);
+        String imageURL = String.format("https://openweathermap.org/img/wn/%s@4x.png", wCond);
         Picasso.get().load(imageURL).error(R.drawable.cloudy).into(weatherCondition);
     }
 }

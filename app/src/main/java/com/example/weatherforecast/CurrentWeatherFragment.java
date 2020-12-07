@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 
 import androidx.annotation.NonNull;
@@ -72,6 +74,9 @@ public class CurrentWeatherFragment extends Fragment {
     private EditText weatherCondition;
     private Metrics metrics;
     private StorySource storySource;
+    private WeatherRequest weatherRequest;
+    private ForecastRequest forecastRequest;
+    private TextView dateTime;
 
 
 
@@ -101,6 +106,7 @@ public class CurrentWeatherFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             cityName = getArguments().getString(CITY_NAME);
             lat = getArguments().getFloat(LATITUDE);
@@ -124,14 +130,20 @@ public class CurrentWeatherFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         init(view);
         initNotificationChannel();
-        thermometer = view.findViewById(R.id.thermometer);
         final RecyclerView recyclerView = view.findViewById(R.id.weatherRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));}
+        else {recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));}
         DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity(),  LinearLayoutManager.HORIZONTAL);
         itemDecoration.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(requireActivity(), R.drawable.separator)));
         recyclerView.addItemDecoration(itemDecoration);
         recyclerView.setAdapter(weatherAdapter);
-
+        if (savedInstanceState != null){
+            metrics = Metrics.getInstance();
+            weatherRequest = (WeatherRequest) savedInstanceState.getSerializable("CURRENT_WEATHER");
+            forecastRequest = (ForecastRequest) savedInstanceState.getSerializable("FORECAST");
+            if (weatherRequest != null) {displayCurrentWeather(weatherRequest);}
+            if (forecastRequest != null) {displayForecast(forecastRequest);}
+        } else dataLoading(cityName, lat, lon);
 
     }
 
@@ -143,7 +155,8 @@ public class CurrentWeatherFragment extends Fragment {
         windSpeed = view.findViewById(R.id.textWindspeed);
         currentWeather = view.findViewById(R.id.weatherIco);
         weatherCondition = view.findViewById(R.id.textWeatherCondition);
-        dataLoading(cityName, lat, lon);
+        thermometer = view.findViewById(R.id.thermometer);
+        dateTime = view.findViewById(R.id.dateTime);
     }
 
     //Загружаем информацию
@@ -153,8 +166,8 @@ public class CurrentWeatherFragment extends Fragment {
     private BroadcastReceiver getDataReceiver = new BroadcastReceiver() { //получаем данные от сервиса
         @Override
         public void onReceive(Context context, Intent intent) {
-            final WeatherRequest weatherRequest = (WeatherRequest) intent.getSerializableExtra(GetDataService.CURRENT_WEATHER);
-            final ForecastRequest forecastRequest = (ForecastRequest) intent.getSerializableExtra(GetDataService.FORECAST_DATA);
+            weatherRequest = (WeatherRequest) intent.getSerializableExtra(GetDataService.CURRENT_WEATHER);
+            forecastRequest = (ForecastRequest) intent.getSerializableExtra(GetDataService.FORECAST_DATA);
             final Handler handler = new Handler();
             if (weatherRequest == null || forecastRequest == null){
                 handler.post(new Runnable() {
@@ -194,30 +207,7 @@ public class CurrentWeatherFragment extends Fragment {
         }
     };
     private void displayWeather(WeatherRequest weatherRequest) throws IOException { //отображаем погоду, в зависимости от настроек (°С или °F)
-        if (!metrics.isFahrenheit()) {
-            thermometer.changeUnit(true);
-            thermometer.setCurrentTemp(weatherRequest.getMain().getTemp() - 273.15f);
-            temperature.setText(String.format("%+.1f%s", weatherRequest.getMain().getTemp() - 273.15f, "°C"));
-        }
-        else {
-            thermometer.changeUnit(false);
-            float temp = (weatherRequest.getMain().getTemp()-273.15f)*1.8f+32;
-            thermometer.setCurrentTemp(temp);
-            temperature.setText(String.format("%+.1f%s", temp, "°F"));
-
-        }
-        city.setText(weatherRequest.getName());
-        sharedPref = requireActivity().getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(CITY_NAME, weatherRequest.getName()).commit();
-        pressure.setText(String.format("%.1f %s", weatherRequest.getMain().getPressure() / 1.33f, getString(R.string.pressureValue)));
-        humidity.setText(String.format("%d%s", weatherRequest.getMain().getHumidity(), "%"));
-        windSpeed.setText(String.format("%.1f %s %s", weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue), getWindDirection(weatherRequest.getWind().getDeg())));
-        weatherCondition.setText(weatherRequest.getWeather()[0].getDescription());
-        String imageURL = String.format("https://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon());
-        Picasso.get().load(imageURL)
-                .error(R.drawable.cloudy)
-                .into(currentWeather);
+        displayCurrentWeather(weatherRequest);
         new Thread(() -> {
             StoryDao storyDao = App
                     .getInstance()
@@ -233,6 +223,35 @@ public class CurrentWeatherFragment extends Fragment {
         }).start();
     }
 
+    private void displayCurrentWeather(WeatherRequest weatherRequest){
+        if (!metrics.isFahrenheit()) {
+            thermometer.changeUnit(true);
+            thermometer.setCurrentTemp(weatherRequest.getMain().getTemp() - 273.15f);
+            temperature.setText(String.format("%+.1f%s", weatherRequest.getMain().getTemp() - 273.15f, "°C"));
+        }
+        else {
+            thermometer.changeUnit(false);
+            float temp = (weatherRequest.getMain().getTemp()-273.15f)*1.8f+32;
+            thermometer.setCurrentTemp(temp);
+            temperature.setText(String.format("%+.1f%s", temp, "°F"));
+
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM \nHH:mm", Locale.getDefault());
+        Date date = new Date(weatherRequest.getDt()*1000);
+        dateTime.setText(sdf.format(date));
+        city.setText(weatherRequest.getName());
+        sharedPref = requireActivity().getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(CITY_NAME, weatherRequest.getName()).commit();
+        pressure.setText(String.format("%.1f %s", weatherRequest.getMain().getPressure() / 1.33f, getString(R.string.pressureValue)));
+        humidity.setText(String.format("%d%s", weatherRequest.getMain().getHumidity(), "%"));
+        windSpeed.setText(String.format("%.1f %s %s", weatherRequest.getWind().getSpeed(), getString(R.string.windSpeedValue), getWindDirection(weatherRequest.getWind().getDeg())));
+        weatherCondition.setText(weatherRequest.getWeather()[0].getDescription());
+        String imageURL = String.format("https://openweathermap.org/img/wn/%s@4x.png", weatherRequest.getWeather()[0].getIcon());
+        Picasso.get().load(imageURL)
+                .error(R.drawable.cloudy)
+                .into(currentWeather);
+    }
     private void displayForecast(ForecastRequest forecastRequest1) { //отображаем прогноз, в зависимости от настроек (°С или °F)
         ArrayList<Forecast> forecasts = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM", Locale.getDefault());
@@ -277,4 +296,12 @@ public class CurrentWeatherFragment extends Fragment {
         else if (degree < 293) return getString(R.string.West);
         else return getString(R.string.NorthWest);
     }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("CURRENT_WEATHER", weatherRequest);
+        outState.putSerializable("FORECAST", forecastRequest);
+    }
+
 }

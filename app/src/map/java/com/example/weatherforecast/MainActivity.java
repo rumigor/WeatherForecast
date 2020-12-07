@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity
     private static final int PERMISSION_REQUEST_CODE = 10;
     private NavigationView navigationView;
     private View header;
+    private static String loadFragment;
 
     // Используется, чтобы определить результат Activity регистрации через
     // Google
@@ -81,7 +82,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         sharedPref = getPreferences(MODE_PRIVATE);
         cityName = sharedPref.getString(CITY_NAME, null);
-        requestPemissions();
         wirelessConnectionLost = new WirelessConnectionLost();
         registerReceiver(wirelessConnectionLost, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
         initNotificationChannel();
@@ -113,6 +113,10 @@ public class MainActivity extends AppCompatActivity
                 signOut();
             }
         });
+        if (savedInstanceState == null) {
+            requestPemissions();
+        }
+
     }
 
     @Override
@@ -489,4 +493,9 @@ public class MainActivity extends AppCompatActivity
                 .commit();
     }
 
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+    }
 }
