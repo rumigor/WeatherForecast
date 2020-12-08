@@ -69,6 +69,6 @@
     <string name="West">З</string>
     <string name="NorthWest">СЗ</string>
     <string name="sign_out">Sign out</string>
-    <string name="day">День:</string>
-    <string name="night">Ночь:</string>
+    <string name="day">Температура днем</string>
+    <string name="night">Температура ночью</string>
 </resources>

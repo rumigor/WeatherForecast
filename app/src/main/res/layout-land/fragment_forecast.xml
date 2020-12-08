@@ -13,33 +13,34 @@
         android:text="TextView"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/wCondForecast"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="117dp"
+        android:layout_height="82dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dayForecast"
+        app:layout_constraintTop_toTopOf="@+id/linearLayout"
         tools:src="@tools:sample/avatars" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wCondForecast">
+        app:layout_constraintStart_toEndOf="@+id/wCondForecast"
+        app:layout_constraintTop_toBottomOf="@+id/dayForecast">
 
         <com.example.weatherforecast.thermometerView.Thermometer
             android:id="@+id/thermometerForecast"
-            android:layout_width="66dp"
-            android:layout_height="267dp"
+            android:layout_width="81dp"
+            android:layout_height="305dp"
             android:layout_centerHorizontal="true"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
             android:layout_marginTop="5dp"
@@ -52,7 +53,7 @@
 
         <TableLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center_horizontal|center_vertical">
 
             <TableRow

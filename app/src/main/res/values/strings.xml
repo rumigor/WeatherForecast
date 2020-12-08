@@ -69,6 +69,6 @@
     <string name="West">W</string>
     <string name="NorthWest">NW</string>
     <string name="sign_out">Sign out</string>
-    <string name="day">Day:</string>
-    <string name="night">Night:</string>
+    <string name="day">Day Temperature</string>
+    <string name="night">Night Temperature</string>
 </resources>

@@ -9,7 +9,7 @@ public class Daily implements Serializable {
     int pressure;
     int humidity;
     float wind_speed;
-    float wind_deg;
+    int wind_deg;
 
     public Weather[] getWeather() {
         return weather;
@@ -59,11 +59,11 @@ public class Daily implements Serializable {
         this.wind_speed = wind_speed;
     }
 
-    public float getWind_deg() {
+    public int getWind_deg() {
         return wind_deg;
     }
 
-    public void setWind_deg(float wind_deg) {
+    public void setWind_deg(int wind_deg) {
         this.wind_deg = wind_deg;
     }
 }

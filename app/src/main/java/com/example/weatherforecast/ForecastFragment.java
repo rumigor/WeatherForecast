@@ -44,6 +44,7 @@ public class ForecastFragment extends Fragment {
     private TextView dateTime;
     private Metrics metrics;
     private String cityName;
+    private EditText tempNight;
 
     public ForecastFragment() {
         // Required empty public constructor
@@ -87,6 +88,7 @@ public class ForecastFragment extends Fragment {
     private void init(View view){
         city = view.findViewById(R.id.textCityF);
         temperature = view.findViewById(R.id.textTempratureF);
+        tempNight = view.findViewById(R.id.textTempratureFN);
         pressure = view.findViewById(R.id.textPressureF);
         humidity =view.findViewById(R.id.textHumidityF);
         windSpeed = view.findViewById(R.id.textWindspeedF);
@@ -101,14 +103,16 @@ public class ForecastFragment extends Fragment {
         if (!metrics.isFahrenheit()) {
             thermometer.changeUnit(true);
             thermometer.setCurrentTemp(forecastRequest.getDaily()[i].getTemp().getDay() - 273.15f);
-            temperature.setText(String.format("%s %+.1f%s / %s %+.1f%s", getString(R.string.day), forecastRequest.getDaily()[i].getTemp().getDay() - 273.15f, "°C", getString(R.string.night), forecastRequest.getDaily()[i].getTemp().getNight() - 273.15f, "°C"));
+            temperature.setText(String.format("%+.1f%s", forecastRequest.getDaily()[i].getTemp().getDay() - 273.15f, "°C"));
+            tempNight.setText(String.format("%+.1f%s",forecastRequest.getDaily()[i].getTemp().getNight() - 273.15f, "°C"));
         }
         else {
             thermometer.changeUnit(false);
             float temp = (forecastRequest.getDaily()[i].getTemp().getDay()-273.15f)*1.8f+32;
             float tempN = (forecastRequest.getDaily()[i].getTemp().getNight()-273.15f)*1.8f+32;
             thermometer.setCurrentTemp(temp);
-            temperature.setText(String.format("%s %+.1f%s / %s %+.1f%s", getString(R.string.day), temp, "°F", getString(R.string.night), tempN, "°F"));
+            temperature.setText(String.format("%+.1f%s", temp, "°F"));
+            tempNight.setText(String.format("%+.1f%s", tempN, "°F"));
 
         }
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM", Locale.getDefault());
@@ -117,7 +121,7 @@ public class ForecastFragment extends Fragment {
         city.setText(cityName);
         pressure.setText(String.format("%.1f %s", forecastRequest.getDaily()[i].getPressure() / 1.33f, getString(R.string.pressureValue)));
         humidity.setText(String.format("%d%s", forecastRequest.getDaily()[i].getHumidity(), "%"));
-        windSpeed.setText(String.format("%.1f %s %s", forecastRequest.getDaily()[i].getWind_speed(), getString(R.string.windSpeedValue), getWindDirection(weatherRequest.getWind().getDeg())));
+        windSpeed.setText(String.format("%.1f %s %s", forecastRequest.getDaily()[i].getWind_speed(), getString(R.string.windSpeedValue), getWindDirection(forecastRequest.getDaily()[i].getWind_deg())));
         weatherCondition.setText(forecastRequest.getDaily()[i].getWeather()[0].getDescription());
         String imageURL = String.format("https://openweathermap.org/img/wn/%s@4x.png", forecastRequest.getDaily()[i].getWeather()[0].getIcon());
         Picasso.get().load(imageURL)

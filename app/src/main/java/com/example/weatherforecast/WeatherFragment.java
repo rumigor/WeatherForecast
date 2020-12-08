@@ -135,7 +135,9 @@ public class WeatherFragment extends Fragment {
             if (weatherRequest != null) {loadCurrentWeather();}
             if (forecastRequest != null) {displayForecast(forecastRequest);}
         } else dataLoading(cityName, lat, lon);
-
+        weatherAdapter.setOnItemClickListener((v, position) -> {
+            loadForecast(forecastRequest, position, weatherRequest.getName());
+        });
     }
 
 
@@ -252,6 +254,15 @@ public class WeatherFragment extends Fragment {
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.weatherFragment, currentWeather)
+                .commit();
+    }
+
+    private void loadForecast(ForecastRequest forecastRequest, int index, String cityName){
+        ForecastFragment forecastFragment = ForecastFragment.create(forecastRequest, index, cityName);
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.weatherFragment, forecastFragment)
+                .addToBackStack(null)
                 .commit();
     }
 
