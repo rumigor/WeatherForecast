@@ -248,6 +248,7 @@ public class WeatherFragment extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putSerializable("CURRENT_WEATHER", weatherRequest);
         outState.putSerializable("FORECAST", forecastRequest);
+        outState.putBoolean("FRAGMENT", true);
     }
     private void loadCurrentWeather(){
         CurrentWeather currentWeather = CurrentWeather.create(weatherRequest);
