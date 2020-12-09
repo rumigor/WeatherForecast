@@ -69,9 +69,7 @@ public class WeatherFragment extends Fragment {
     private StorySource storySource;
     private WeatherRequest weatherRequest;
     private ForecastRequest forecastRequest;
-
-
-
+    private boolean isForecastEnabled;
 
 
     public static WeatherFragment create(String cityName, float lat, float lon) {
@@ -130,10 +128,17 @@ public class WeatherFragment extends Fragment {
         recyclerView.setAdapter(weatherAdapter);
         if (savedInstanceState != null){
             metrics = Metrics.getInstance();
+            isForecastEnabled = savedInstanceState.getBoolean("FRAGMENT");
             weatherRequest = (WeatherRequest) savedInstanceState.getSerializable("CURRENT_WEATHER");
             forecastRequest = (ForecastRequest) savedInstanceState.getSerializable("FORECAST");
-            if (weatherRequest != null) {loadCurrentWeather();}
-            if (forecastRequest != null) {displayForecast(forecastRequest);}
+            if (!isForecastEnabled){
+                if (weatherRequest != null) {
+                    loadCurrentWeather();
+                }
+                if (forecastRequest != null) {
+                    displayForecast(forecastRequest);
+                }
+            } else displayForecast(forecastRequest);
         } else dataLoading(cityName, lat, lon);
         weatherAdapter.setOnItemClickListener((v, position) -> {
             loadForecast(forecastRequest, position, weatherRequest.getName());
@@ -248,7 +253,7 @@ public class WeatherFragment extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putSerializable("CURRENT_WEATHER", weatherRequest);
         outState.putSerializable("FORECAST", forecastRequest);
-        outState.putBoolean("FRAGMENT", true);
+        outState.putBoolean("FRAGMENT", isForecastEnabled);
     }
     private void loadCurrentWeather(){
         CurrentWeather currentWeather = CurrentWeather.create(weatherRequest);
@@ -259,6 +264,7 @@ public class WeatherFragment extends Fragment {
     }
 
     private void loadForecast(ForecastRequest forecastRequest, int index, String cityName){
+        isForecastEnabled = true;
         ForecastFragment forecastFragment = ForecastFragment.create(forecastRequest, index, cityName);
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()

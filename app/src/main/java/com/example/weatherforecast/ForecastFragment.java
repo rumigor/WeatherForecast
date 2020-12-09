@@ -81,6 +81,11 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (savedInstanceState != null){
+            forecastRequest = (ForecastRequest) savedInstanceState.getSerializable(FORECAST);
+            i = savedInstanceState.getInt(INDEX);
+            cityName = savedInstanceState.getString(CITY_NAME);
+        }
         init(view);
         displayWeather(forecastRequest);
     }
@@ -137,5 +142,13 @@ public class ForecastFragment extends Fragment {
         else if (degree < 248) return getString(R.string.SouthWest);
         else if (degree < 293) return getString(R.string.West);
         else return getString(R.string.NorthWest);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(CITY_NAME, cityName);
+        outState.putSerializable(FORECAST, forecastRequest);
+        outState.putInt(INDEX, i);
     }
 }

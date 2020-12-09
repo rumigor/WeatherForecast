@@ -41,7 +41,9 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
@@ -116,7 +118,13 @@ public class MainActivity extends AppCompatActivity
         if (savedInstanceState == null) {
             requestPemissions();
         }
-
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestLocation();
+            }
+        });
     }
 
     @Override
@@ -441,6 +449,7 @@ public class MainActivity extends AppCompatActivity
                     lat = (float)location.getLatitude(); // Широта
                     lng = (float)location.getLongitude(); // Долгота
                     fragmentLoading(cityName, lat, lng);
+                    locationManager.removeUpdates(this);
                 }
             });
         } else fragmentLoading(cityName, lat, lng);
@@ -452,6 +461,7 @@ public class MainActivity extends AppCompatActivity
                     lat = (float)location.getLatitude(); // Широта
                     lng = (float)location.getLongitude(); // Долгота
                     fragmentLoading(cityName, lat, lng);
+                    locationManager.removeUpdates(this);
                 }
             });
         }
