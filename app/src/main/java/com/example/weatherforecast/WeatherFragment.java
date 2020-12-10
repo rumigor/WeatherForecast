@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -39,6 +40,7 @@ import com.example.weatherforecast.roomDataBase.Story;
 import com.example.weatherforecast.roomDataBase.StoryDao;
 import com.example.weatherforecast.roomDataBase.StorySource;
 import com.example.weatherforecast.thermometerView.Thermometer;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -119,6 +121,14 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         initNotificationChannel();
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity mainActivity = (MainActivity)requireActivity();
+                mainActivity.requestLocation();
+            }
+        });
         final RecyclerView recyclerView = view.findViewById(R.id.weatherRecyclerView);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));}
         else {recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));}

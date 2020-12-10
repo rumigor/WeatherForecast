@@ -118,13 +118,7 @@ public class MainActivity extends AppCompatActivity
         if (savedInstanceState == null) {
             requestPemissions();
         }
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                requestLocation();
-            }
-        });
+
     }
 
     @Override
@@ -428,7 +422,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
     // Запрашиваем координаты
-    private void requestLocation() {
+    protected void requestLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             fragmentLoading(cityName, 0, 0);
