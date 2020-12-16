@@ -204,6 +204,8 @@ public class SearchHistory extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("FILTER_ON", isFiltered);
-        outState.putString("CITY_NAME", cityFilter.getText().toString());
+        if (cityFilter.getText() != null) {
+            outState.putString("CITY_NAME", cityFilter.getText().toString());
+        }
     }
 }

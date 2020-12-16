@@ -434,6 +434,8 @@ public class MainActivity extends AppCompatActivity
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_COARSE);
         String provider = locationManager.getBestProvider(criteria, true);
+        lat = 0;
+        lng = 0;
         if (provider != null) {
             // Будем получать геоположение через каждые 10 минут или каждые
             // 10 метров
