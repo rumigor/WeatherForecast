@@ -9,38 +9,198 @@
     tools:context=".CurrentWeatherFragment">
 
     <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="200dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="24dp"
-        android:src="@drawable/rainy"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/weatherIco"
+        android:layout_width="142dp"
+        android:layout_height="94dp"
+        android:layout_weight="1"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cityName2"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/cityName2"
+        android:id="@+id/forecastTitle2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/cityName"
+        android:layout_marginTop="24dp"
+        android:text="@string/forecast"
         android:textColor="#FFEBEE"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-    <TextView
-        android:id="@+id/currentTemp2"
-        android:layout_width="wrap_content"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/weatherRecyclerView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/todayTemp"
-        android:textColor="#FFEBEE"
-        android:textSize="36sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView2"
-        app:layout_constraintTop_toBottomOf="@+id/cityName2" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/forecastTitle2" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/weatherIco"
+        app:layout_constraintVertical_bias="0.0">
+
+        <com.example.weatherforecast.thermometerView.Thermometer
+            android:id="@+id/thermometer"
+            android:layout_width="66dp"
+            android:layout_height="267dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="5dp"
+            app:innerColor="@color/innerColor"
+            app:middleColor="@color/middleColor"
+            app:outerColor="@color/outerColor"
+            app:radius="60dp" />
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cityName" />
+
+                <EditText
+                    android:id="@+id/textCity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:enabled="false"
+                    android:inputType="textPersonName"
+                    android:text=""
+                    android:textColor="@android:color/holo_orange_light" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/temperature" />
+
+                <EditText
+                    android:id="@+id/textTemprature"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:enabled="false"
+                    android:inputType="textPersonName"
+                    android:text=""
+                    android:textColor="@android:color/holo_orange_light" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/weather_condition" />
+
+                <EditText
+                    android:id="@+id/textWeatherCondition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:enabled="false"
+                    android:inputType="textPersonName"
+                    android:text=""
+                    android:textColor="@android:color/holo_orange_light"
+                    android:textSize="14sp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pressure" />
+
+                <EditText
+                    android:id="@+id/textPressure"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:enabled="false"
+                    android:inputType="textPersonName"
+                    android:text=""
+                    android:textColor="@android:color/holo_orange_light" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/humidity" />
+
+                <EditText
+                    android:id="@+id/textHumidity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:enabled="false"
+                    android:inputType="textPersonName"
+                    android:text=""
+                    android:textColor="@android:color/holo_orange_light" />
+            </TableRow>
+
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/wind_speed" />
+
+                <EditText
+                    android:id="@+id/textWindspeed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:enabled="false"
+                    android:inputType="textPersonName"
+                    android:text=""
+                    android:textColor="@android:color/holo_orange_light" />
+            </TableRow>
+
+        </TableLayout>
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
