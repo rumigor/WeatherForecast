@@ -21,7 +21,7 @@ public interface StoryDao {
     void deleteStory(Story story);
 
     @Query("DELETE FROM story WHERE id = :id")
-    void deteleStoryById(long id);
+    void deleteStoryById(long id);
 
     @Query("SELECT * FROM story")
     List<Story> getAllStories();

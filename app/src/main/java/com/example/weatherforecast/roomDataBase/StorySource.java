@@ -1,9 +1,5 @@
 package com.example.weatherforecast.roomDataBase;
 
-import com.example.weatherforecast.roomDataBase.Story;
-import com.example.weatherforecast.roomDataBase.StoryDao;
-
-import java.util.Collections;
 import java.util.List;
 
 public class StorySource {
@@ -42,7 +38,7 @@ public class StorySource {
     }
 
     public void removeStory(long id){
-        storyDao.deteleStoryById(id);
+        storyDao.deleteStoryById(id);
         LoadStoryList();
     }
 
